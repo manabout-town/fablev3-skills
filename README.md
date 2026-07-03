@@ -164,6 +164,42 @@ Notion 포트폴리오 페이지
 
 ---
 
+### 애드온 `pdlc-feature-advisor` — 기능 전략 제안 (반복 스프린트 진입점)
+
+기존 서비스를 분석해 "왜 이 기능이 이 서비스에 필요한가"를 근거와 함께 제안한다. 아이디어 나열이 아닌 문제→해결 연결이 핵심 — 근거 없는 제안은 출력하지 않는다.
+
+**사용 시점:** `"어떤 기능 추가하면 좋을까"`, `"다음 스프린트 뭐 만들지"`, `"유저 리텐션 올리고 싶다"`, `"서비스 고도화 아이디어"`
+
+| 산출물 | 설명 |
+|--------|------|
+| `FEAT-IDEA-###` 제안 목록 | 타깃 Pain Point + 페르소나 + 레퍼런스 사례 + 우선순위 점수 |
+| 우선순위 요약표 | Impact × Effort 점수로 정렬된 제안 비교 |
+| REQ 편입 | 선택한 제안을 BRD에 REQ-### 항목으로 자동 추가 |
+
+**분석 기반:** 페르소나(2단계) + Pain Point(1단계) + 현재 기능(3·5단계) + 운영 이슈(7단계). 문서 없으면 코드베이스에서 직접 추론.
+
+**도메인 패턴 라이브러리:** 커머스 / 소셜·커뮤니티 / 예약·매칭 / 생산성·SaaS / 콘텐츠·미디어 — 각 도메인별 검증된 기능 패턴을 근거로 제안.
+
+---
+
+### 애드온 `pdlc-launch-readiness` — 출시 전 점검 (7단계 ↔ 8단계 사이)
+
+완성된 결과물(코드 + 문서)을 대상으로 출시 준비도를 감사(audit)하고, 발견사항을 직접 보완한 뒤 Go/No-Go를 판정한다. QA가 "명세대로 동작하는가"를 묻는다면, 이 스킬은 "낯선 사용자와 공격자 앞에 내놓아도 되는가"를 묻는다.
+
+**사용 시점:** `"출시 전 점검하자"`, `"실제로 배포해도 되나?"`, `"출시 체크리스트"`, `"Go/No-Go 판정해줘"`
+
+| 산출물 | 설명 |
+|--------|------|
+| `docs/09-launch/launch-audit.md` | LR-### 발견사항 (4개 영역 × 심각도 P0~P3, 증거 필수, FEAT/POL/OPS 역참조) |
+| `docs/09-launch/remediation-log.md` | 보완 조치 + 재검증 기록 |
+| `docs/09-launch/launch-checklist.md` | 전 항목 체크리스트 + Go/No-Go 판정 |
+
+**4개 감사 영역:** ① 보안·데이터 (RLS, 키 노출, 개인정보) ② 품질·성능 (상태 화면, N+1, Lighthouse, 접근성) ③ 배포·운영 준비 (재현성, 롤백, 모니터링, 백업) ④ 사용자·법무·마케팅 (약관/개인정보처리방침, OG/SEO, 애널리틱스, 온보딩)
+
+**Go 조건:** P0 0건 + 미승인 P1 0건. 포트폴리오 전용 프로젝트에는 선택, 실사용자 출시에는 필수.
+
+---
+
 ### 8단계 `pdlc-8-portfolio` — 노션 포트폴리오
 
 1~7단계의 산출물을 채용 담당자가 5분 안에 파악할 수 있는 이야기로 재구성한다.
@@ -202,6 +238,8 @@ cp -r fablev3-skills/pdlc-5-build ~/.claude/skills/
 cp -r fablev3-skills/pdlc-6-qa ~/.claude/skills/
 cp -r fablev3-skills/pdlc-7-ops ~/.claude/skills/
 cp -r fablev3-skills/pdlc-8-portfolio ~/.claude/skills/
+cp -r fablev3-skills/pdlc-feature-advisor ~/.claude/skills/
+cp -r fablev3-skills/pdlc-launch-readiness ~/.claude/skills/
 ```
 
 설치 후 Claude Code 세션을 재시작하면 스킬이 활성화된다.
@@ -239,6 +277,8 @@ AS-IS 분석해줘               → 1단계 (pdlc-1-asis-tobe)
 이제 구현하자                 → 5단계 (pdlc-5-build)
 테스트 시나리오 작성해줘      → 6단계 (pdlc-6-qa)
 운영 이슈 시나리오 만들자     → 7단계 (pdlc-7-ops)
+기능 제안해줘                 → 애드온 (pdlc-feature-advisor)
+출시 전 점검하자              → 애드온 (pdlc-launch-readiness)
 포트폴리오 정리해줘           → 8단계 (pdlc-8-portfolio)
 ```
 
