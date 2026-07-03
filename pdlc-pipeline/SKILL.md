@@ -22,6 +22,10 @@ Control tower for an 8-stage pipeline that takes a real or portfolio service fro
 
 Each stage consumes the previous stage's outputs. Stages can be skipped, but downstream quality degrades without upstream artifacts — always surface that trade-off and let the user decide.
 
+**Add-ons**:
+- `pdlc-feature-advisor` slots after stage 5 (and after any sprint iteration) — strategic feature suggestion grounded in existing personas, Pain Points, and domain patterns. See workflow C for automatic suggestion timing.
+- `pdlc-launch-readiness` slots between stages 7 and 8 — a pre-launch audit + remediation + Go/No-Go pass over the finished build. Optional for portfolio-only projects, mandatory before shipping to real users. When the user says "출시하자", "실제로 배포하자", or similar after stage 6/7, route there before stage 8. Its state lives in a top-level `launch_readiness` block in `pipeline-state.json`, separate from the numeric stages.
+
 ## State file
 
 All progress lives in a single file at the project root: `docs/pipeline-state.json`. The schema, file-path conventions, and ID system are defined in `references/conventions.md` — read it before creating or modifying state. Every stage skill follows the same conventions, so this file is the pipeline's single source of truth.
@@ -53,6 +57,15 @@ When a stage skill finishes (control returns here, or the user says "1단계 끝
 1. Confirm the stage's deliverables exist at the convention paths.
 2. Skim the deliverables against the **gate checklist** (per-stage completion criteria in `references/conventions.md`). E.g., does the stage-2 BRD assign REQ IDs? Does the stage-3 functional spec back-reference REQ IDs?
 3. If passing: update state (stage `done`, `completed_at`, `summary`, bump `current_stage`) and propose the next stage.
+   - **Stage 5 특별 규칙**: 5단계를 `done` 처리한 직후, 6단계(QA)를 제안하기 전에 반드시 아래 메시지를 출력한다:
+
+     > "✅ 5단계(구현) 완료. 6단계(QA)로 넘어가기 전에 **기능 전략 제안(pdlc-feature-advisor)**을 실행할 수 있습니다.
+     > 현재 서비스의 페르소나·Pain Point·구현 기능을 분석해 다음 스프린트 후보 기능을 제안합니다.
+     > 실행할까요? (예 / 아니오 — 아니오 선택 시 6단계로 바로 진입합니다)"
+
+     사용자가 "예" 또는 긍정 응답 → `pdlc-feature-advisor` 스킬 즉시 실행.
+     사용자가 "아니오" 또는 건너뜀 → `decisions` 배열에 `"feature-advisor skipped after stage 5"` 기록 후 6단계 진입.
+
 4. If failing: name the specific gaps and route back to the stage skill. The gate is a quality firewall — waving things through doubles the cost downstream.
 
 ### D. Rework / going back
