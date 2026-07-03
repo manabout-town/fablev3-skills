@@ -63,6 +63,9 @@ docs/
     "7": { "name": "ops",           "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
     "8": { "name": "portfolio",     "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false }
   },
+  "opportunities": [
+    { "id": "OPP-001", "hypothesis": "커뮤니티 기능이 재방문율을 높인다", "lens": "참여·리텐션", "status": "accepted | rejected | pending", "req_id": "REQ-005" }
+  ],
   "decisions": [
     { "date": "2026-07-02", "stage": 2, "decision": "결제 기능을 2차 범위로 이동", "reason": "MVP 검증에 불필요" }
   ],
@@ -82,6 +85,7 @@ docs/
 
 | ID | 대상 | 부여 단계 | 예시 |
 |---|---|---|---|
+| OPP-### | 확장 기회 가설 | 0 (킥오프, 발산 단계) | OPP-001 |
 | PP-### | Pain Point | 1 (프로세스 분석) | PP-001 |
 | INS-### | 인터뷰 인사이트 | 2 (인터뷰) | INS-001 |
 | REQ-### | 요구사항 (FR 001~, NFR 101~) | 2 (BRD) | REQ-001 |
@@ -95,6 +99,8 @@ docs/
 | RISK-### | 리스크 | 전 단계 | RISK-001 |
 
 연결 방향: `PP/INS → REQ → FEAT → SCR/POL → TC → BUG → OPS`. 하류 문서는 반드시 상류 ID를 역참조 컬럼으로 갖는다 (예: 기능명세 표에 "관련 요구사항: REQ-003" 컬럼).
+
+OPP는 PP와 나란히 REQ의 근거가 될 수 있는 별도 진입점이다: `OPP → (2단계 인터뷰 검증) → REQ`. 검증 없이 OPP에서 곧바로 Must REQ가 되는 것은 금지 — 검증 전 OPP 기반 REQ는 Could 이하로만 편입한다.
 
 ## 4. 언어 규칙
 
@@ -129,6 +135,13 @@ docs/
 
 ## 범위 밖 (Out of Scope)
 (처음부터 하지 않기로 한 것 — 이후 단계에서 범위 방어에 사용)
+
+## 확장 가설 (Expansion Hypotheses) — 있는 경우만
+| ID | 가설 | 렌즈 | 기대 효과(메커니즘) | 비용/리스크 | 검증 방법 |
+|----|------|------|---------------------|-------------|-----------|
+| OPP-001 | 커뮤니티 기능이 재방문율을 높인다 | 참여·리텐션 | 구매 전 정보 탐색이 스토어 안에서 일어나 이탈 감소 | 모더레이션 부담 | 2단계 인터뷰에서 검증 |
+
+(제안했으나 기각된 항목은 한 줄 사유와 함께 범위 밖 섹션에 기록)
 
 ## 제약 조건
 - 기간:

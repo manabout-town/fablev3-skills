@@ -32,7 +32,9 @@ List per-step problems as pain points, each with a PP-### ID. Dig past symptoms 
 
 ### 4. Design the TO-BE
 
-Decompose the TO-BE the same way, then build a mapping table showing which PP each improvement resolves. If a PP goes unresolved, explicitly mark it "out of scope for this round" (this becomes your scope-defense evidence later). The TO-BE does not fix implementation — write "a notification is sent automatically" and leave how (push? email?) for stage 3.
+**Expand before you converge.** Before drafting the TO-BE, look past the PP list once: does the brief carry 확장 가설(OPP-###)? Do any *new* opportunities emerge from the AS-IS itself (e.g., a step users repeat daily is a retention hook; a step where users consult others is a community seed; a purchase step is a monetization surface)? Raise at most 1–2 as questions to the user — "이 단계에서 사용자들이 서로 후기를 찾아다니는데, 커뮤니티 기능을 넣으면 수익 구조에도 도움이 되지 않을까요?" — with mechanism and cost stated. Accepted ones become OPP entries in the brief; then converge.
+
+Decompose the TO-BE the same way, then build a mapping table showing which PP (and, where applicable, OPP) each improvement resolves. If a PP goes unresolved, explicitly mark it "out of scope for this round" (this becomes your scope-defense evidence later). The TO-BE does not fix implementation — write "a notification is sent automatically" and leave how (push? email?) for stage 3.
 
 ### 5. Visualize
 
@@ -57,5 +59,6 @@ Deliverables in Korean, industry terms glossed in English on first mention — e
 - [ ] AS-IS decomposed into steps, each with actor·tools·time
 - [ ] Every pain point has a PP ID, quantitative/qualitative evidence, and cause analysis
 - [ ] TO-BE steps mapped to PPs in a table (unresolved PPs marked out of scope)
+- [ ] OPP-### exists in brief → included in TO-BE mapping table as additional column (if none exist, skip)
 - [ ] Two Mermaid flowcharts (AS-IS, TO-BE)
 - [ ] Quantified expected-impact table
