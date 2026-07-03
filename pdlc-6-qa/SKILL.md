@@ -12,6 +12,7 @@ Systematically verify "does it behave as specified." QA's oracle is not the code
 - `docs/03-spec/functional-spec.md` — the test oracle; FEAT flows/validation/error cases are the source of TCs.
 - `docs/03-spec/policies.md`, `docs/03-spec/screen-design.md` — criteria for policy violations and missing states.
 - `docs/05-build/build-notes.md` — FEAT ↔ file mapping, run instructions.
+- **Seeded DB** (`pdlc-seed-data` add-on) — TC preconditions assume the reproducible seeded state (`supabase db reset` + seed). If no seed exists, run the add-on first; testing against an empty or hand-poked DB makes results unreproducible.
 - `docs/pipeline-state.json` — set stage 6 `in_progress` on start.
 
 ## Outputs

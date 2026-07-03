@@ -26,6 +26,7 @@ Claude Code의 [Skills](https://docs.anthropic.com/en/docs/claude-code/skills) �
 **핵심 특징:**
 
 - **추적성(Traceability)**: Pain Point → 요구사항 → 기능 → 화면 → 테스트 케이스까지 ID로 일관되게 연결
+- **발산 후 수렴**: 킥오프와 1단계에서 Claude가 수익 모델·리텐션·커뮤니티 등 사용자가 말하지 않은 기회를 먼저 질문으로 제안(OPP-###), 2단계 인터뷰로 검증한 뒤에만 요구사항에 편입
 - **게이트 검증**: 각 단계 완료 시 품질 체크리스트를 통과해야 다음 단계로 진행
 - **단일 상태 파일**: `docs/pipeline-state.json`이 전체 파이프라인의 진행 상태를 관리
 - **한국어 산출물**: 본문은 한국어, 업계 용어는 첫 등장 시 영어 병기
@@ -182,6 +183,35 @@ Notion 포트폴리오 페이지
 
 ---
 
+### 애드온 `pdlc-seed-data` — 더미데이터 + 로직 스모크 테스트 (5단계 직후)
+
+명세·페르소나에서 도출한 현실적인 더미데이터(시드)를 만들어 DB에 넣고, 그 데이터 위에서 로직을 실제로 한 번 돌려본다(스모크 테스트, SMK-###). 6단계 QA·적대적 검증·8단계 GIF 녹화가 빈 DB 위에서 돌아가는 일을 차단한다. 페르소나별 계정 + 지정 빈 계정(`empty@demo.test`), 경계값·에러 유발 행, RLS 경계 검증까지 포함하며 `supabase db reset` 한 번으로 동일 상태가 재현돼야 한다.
+
+**사용 시점:** `"더미데이터 넣자"`, `"시드 데이터 만들어줘"`, `"테스트 데이터로 돌려보자"` — 또는 시드 없이 6·8단계를 요청하면 자동으로 먼저 라우팅
+
+| 산출물 | 설명 |
+|--------|------|
+| `supabase/seed.sql` (또는 `scripts/seed.ts`) | 멱등(idempotent) 시드, 마이그레이션 옆에 버전 관리 |
+| `docs/055-seed/seed-data.md` | 데이터셋 설계표 + SMK-### 스모크 테스트 로그 |
+
+---
+
+### 애드온 `pdlc-adversarial` — 적대적 검증 사이클 (6단계 ↔ 7단계 사이)
+
+팀 블랙(최선을 다해 버그를 유발)과 팀 화이트(버그 수정 + 후속 위험 진단)가 최대 2라운드 진행한다. 한 라운드에서 팀 블랙이 버그를 하나도 못 내면 사이클을 조기 종료하고 다음 단계로 — "버그 없음"을 실패가 아닌 내구성 신호로 취급한다. QA가 명세 기반 협조적 검증이라면, 이 스킬은 명세 밖 틈을 노리는 적대적 검증이다.
+
+**사용 시점:** `"팀 블랙 팀 화이트 돌리자"`, `"일부러 깨보자"`, `"레드팀 블루팀"`, `"내구성 검증"`
+
+| 산출물 | 설명 |
+|--------|------|
+| `docs/065-adversarial/attack-log.md` | 라운드별 전 공격 시도 기록 (ATK-###, 성공·실패 무관) |
+| `docs/065-adversarial/round-report.md` | 라운드별 결과 + 팀 화이트 수정 + 후속 위험 진단 + 사이클 결정 |
+| `docs/06-qa/bug-reports/BUG-###.md` | 확정 버그 리포트 (6단계 번호 이어감) |
+
+**핵심 규칙:** 팀 블랙 전체 공격을 먼저 로깅한 뒤 팀 화이트로 전환(선의의 전력 유지) / 확정 버그는 증거·재현 절차 필수 / 팀 화이트는 수정에 더해 "같은 실패 클래스가 다른 곳에도?"를 진단(RISK-###) → 미해결분은 7단계·launch-readiness로 이관.
+
+---
+
 ### 애드온 `pdlc-launch-readiness` — 출시 전 점검 (7단계 ↔ 8단계 사이)
 
 완성된 결과물(코드 + 문서)을 대상으로 출시 준비도를 감사(audit)하고, 발견사항을 직접 보완한 뒤 Go/No-Go를 판정한다. QA가 "명세대로 동작하는가"를 묻는다면, 이 스킬은 "낯선 사용자와 공격자 앞에 내놓아도 되는가"를 묻는다.
@@ -239,6 +269,8 @@ cp -r fablev3-skills/pdlc-6-qa ~/.claude/skills/
 cp -r fablev3-skills/pdlc-7-ops ~/.claude/skills/
 cp -r fablev3-skills/pdlc-8-portfolio ~/.claude/skills/
 cp -r fablev3-skills/pdlc-feature-advisor ~/.claude/skills/
+cp -r fablev3-skills/pdlc-seed-data ~/.claude/skills/
+cp -r fablev3-skills/pdlc-adversarial ~/.claude/skills/
 cp -r fablev3-skills/pdlc-launch-readiness ~/.claude/skills/
 ```
 
@@ -275,7 +307,9 @@ AS-IS 분석해줘               → 1단계 (pdlc-1-asis-tobe)
 기능명세서 만들어줘           → 3단계 (pdlc-3-spec)
 간트차트 만들어줘             → 4단계 (pdlc-4-sprint-plan)
 이제 구현하자                 → 5단계 (pdlc-5-build)
+더미데이터 넣고 돌려보자      → 애드온 (pdlc-seed-data)
 테스트 시나리오 작성해줘      → 6단계 (pdlc-6-qa)
+팀 블랙 팀 화이트 돌리자      → 애드온 (pdlc-adversarial)
 운영 이슈 시나리오 만들자     → 7단계 (pdlc-7-ops)
 기능 제안해줘                 → 애드온 (pdlc-feature-advisor)
 출시 전 점검하자              → 애드온 (pdlc-launch-readiness)

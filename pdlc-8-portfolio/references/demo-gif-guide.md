@@ -50,7 +50,7 @@ async function scene01_onboarding() {
 }
 ```
 
-주의: 시드 데이터를 장면 전에 리셋하는 스크립트를 같이 두면 (`supabase db reset` + seed) 몇 번이든 동일 화면이 나온다. 모바일 장면은 `viewport: { width: 390, height: 844 }`.
+주의: 시드 데이터를 장면 전에 리셋하는 스크립트를 같이 두면 (`supabase db reset` + seed) 몇 번이든 동일 화면이 나온다. 시드는 `pdlc-seed-data` 애드온의 산출물을 그대로 쓴다 — 없으면 녹화 전에 그 스킬부터 실행. 빈 상태 장면(06)은 시드의 지정 빈 계정(`empty@demo.test`)으로 찍는다. 모바일 장면은 `viewport: { width: 390, height: 844 }`.
 
 ### 방법 B: 수동 녹화
 - macOS: `Cmd+Shift+5` 영역 녹화 → .mov / Windows: `Win+G`

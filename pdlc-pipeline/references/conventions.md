@@ -66,6 +66,22 @@ docs/
   "opportunities": [
     { "id": "OPP-001", "hypothesis": "커뮤니티 기능이 재방문율을 높인다", "lens": "참여·리텐션", "status": "accepted | rejected | pending", "req_id": "REQ-005" }
   ],
+  "seed_data": {
+    "status": "pending | in_progress | done | skipped",
+    "account_count": 0,
+    "row_counts": {},
+    "smk_pass_rate": null,
+    "summary": ""
+  },
+  "adversarial": {
+    "status": "pending | in_progress | done | skipped",
+    "rounds_run": 0,
+    "total_attacks": 0,
+    "breaks_found": 0,
+    "breaks_fixed": 0,
+    "open_risks": [],
+    "summary": ""
+  },
   "decisions": [
     { "date": "2026-07-02", "stage": 2, "decision": "결제 기능을 2차 범위로 이동", "reason": "MVP 검증에 불필요" }
   ],

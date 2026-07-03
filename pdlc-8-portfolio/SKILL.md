@@ -11,6 +11,7 @@ Recompose stages 1–7 into a story for the reader. This is not copying document
 
 - All of `docs/` (00–07) — especially the `decisions` array in `pipeline-state.json`. **The record of decisions and pivots is this portfolio's differentiator.** A portfolio that only lists outputs and one that explains *why* are worlds apart.
 - A locally runnable app from stage 5 — required for demo GIF recording.
+- **A seeded database** (`pdlc-seed-data` add-on: `supabase db reset` + seed). GIFs must never show accidentally-empty screens — only the designated empty account appears in the deliberate empty-state scene. If the seed add-on never ran, route there before recording anything.
 - Set stage 8 `in_progress` on start.
 
 ## Outputs
@@ -23,9 +24,9 @@ Recompose stages 1–7 into a story for the reader. This is not copying document
 
 The main page must contain sections 1–8 below. Detailed layouts and Korean copy patterns are in `references/notion-structure.md` — read it before writing anything.
 
-1. **10-second hook** — the first screenful decides whether a recruiter keeps reading. One punchy headline (problem or outcome, not the service name), one sub-line, the hero GIF (the single most impressive scene), and a 4–6 cell project card (기간/역할/스택/성과). No greeting, no "안녕하세요" — lead with the substance.
+1. **10-second hook** — the target reader is a **veteran HR/recruiting professional (베테랑 인사실무자)** skimming dozens of portfolios; the first screenful decides whether they keep reading. One punchy headline (problem or outcome, not the service name), one sub-line, the hero GIF (the single most impressive scene), and a 4–6 cell project card (기간/역할/스택/성과). No greeting, no "안녕하세요" — lead with the substance.
 2. **Live demo GIFs** — at least **8 scenes** covering distinct features or pages, each GIF with a one-line caption stating what to watch and the FEAT/SCR ID. With only 3 core features, reach 8+ by treating states and journeys as scenes: onboarding, each feature's happy path, a validation-error moment, an empty state, the integrated journey, responsive/mobile view. Production process: `references/demo-gif-guide.md`.
-3. **30-second summary** — problem → approach → what was built → result, in 4–6 sentences of prose. Someone who reads only this section should still get the whole project.
+3. **30-second summary** — 4–6 sentences of prose that must land four things unambiguously: **what the app is**, **why it had to be built (개발 필요성)**, **the concrete real-life error/pain it addresses (실생활 에러·불편 사항)**, and **that it was solved** (with the headline result). Someone who reads only this section should still get the whole project. Everything below sections 1–3 is supporting detail that unfolds in order — hook first, depth after, never the reverse.
 4. **결과지표 (Outcome metrics)** — a table: stage-1 expected-impact metrics vs achieved (or measured-in-simulation) values, TC pass rate, bug find/fix counts, delivery vs plan. Label simulated numbers honestly — faking measurement kills trust in every other number.
 5. **이 프로젝트에서 봐야 할 N가지** — 3–5 curated highlights, each linking to evidence: e.g., a contradicted hypothesis that changed the direction (INS/decision), an RLS design detail (db-schema), a boundary TC that caught a real bug (BUG report), an ops scenario that exposed a missing detection mechanism (OPS). Pick moments that show judgment, not effort.
 6. **문제 → 해결 매핑 (full)** — the complete traceability table: every PP → the REQ it spawned → the FEAT/POL that addressed it → verification (TC result) → residual state (해소/부분/2차로 이월). Unresolved PPs stay in the table with their disposition — completeness here *is* the credibility.
@@ -38,7 +39,8 @@ The main page must contain sections 1–8 below. Detailed layouts and Korean cop
 
 - Unfinished stages: tell the user; choose finish-first vs publish-with-"진행 중" markers.
 - Ask the audience: public (hiring) vs private archive. If public, sweep all artifacts (including GIFs) for real names, real data, API keys.
-- Check Notion MCP connectivity; if connected, confirm target workspace/parent page.
+- Check Notion MCP connectivity. **Target page confirmation is mandatory**: the user's designated portfolio parent page is `https://app.notion.com/p/390a2e8bce5080349515fadef1444dd0?source=copy_link` — present this URL and ask the user to confirm it is (still) the right destination **before creating any page**, even when it looks obviously correct. If they name a different page, use that instead.
+- Verify a seeded DB is available for GIF recording (see Inputs); if not, run `pdlc-seed-data` first.
 
 ### 2. Produce the demo GIFs
 
@@ -50,7 +52,11 @@ Draft all 8 sections in `portfolio.md` first (single source of truth), following
 
 ### 4. Build the Notion pages (MCP connected)
 
-Follow the page tree and block-conversion rules in `references/notion-structure.md`. Key rules: main page carries sections 1–8; per-stage subpages carry depth; big tables show 5–10 representative rows with a link to the full doc; upload GIFs as file blocks (mind per-file size limits — see the GIF guide); Mermaid goes in as code blocks with a text summary alongside. After creation, send the user the URL list and ask them to open and verify no broken blocks.
+**Two hard gates before creating any page:**
+1. **GIF gate** — `docs/08-portfolio/gifs/` must contain the full planned scene set (8+ files matching the scene table). If any GIF is missing, stop and return to step 2. Never publish pages with GIF placeholders intending to fill them "later."
+2. **Destination gate** — the target parent page URL confirmed by the user in Preflight (default: `https://app.notion.com/p/390a2e8bce5080349515fadef1444dd0?source=copy_link`). If it wasn't re-confirmed this session, ask now.
+
+Follow the page tree and block-conversion rules in `references/notion-structure.md`. Key rules: main page carries sections 1–8; per-stage subpages carry depth; **absolutely no toggle/dropdown blocks anywhere** — a recruiter will not click to expand, so anything worth showing is laid out flat (headings, subpages, representative rows), and anything not worth showing flat is cut; big tables show 5–10 representative rows with a link to the full doc; upload GIFs as file blocks (mind per-file size limits — see the GIF guide); Mermaid goes in as code blocks with a text summary alongside. After creation, send the user the URL list and ask them to open and verify no broken blocks.
 
 ### 5. Fallback (no MCP)
 
@@ -69,7 +75,10 @@ Deliverables in Korean, terms glossed in English on first mention. If public-fac
 ## Completion criteria (self-check)
 
 - [ ] All 8 mandatory sections present, in order
-- [ ] 8+ demo GIFs, each captioned with FEAT/SCR ID; hero GIF in section 1
+- [ ] 8+ demo GIFs **existed on disk before any Notion page was created**; each captioned with FEAT/SCR ID; hero GIF in section 1; recorded against seeded data (no accidental empty screens)
+- [ ] Notion destination URL re-confirmed by the user this session
+- [ ] Zero toggle/dropdown blocks on any page
+- [ ] §3 explicitly covers: app 내용 / 개발 필요성 / 실생활 에러·불편 / 해결 결과
 - [ ] Metrics table separates measured vs simulated honestly
 - [ ] Problem→solution mapping covers 100% of PPs (including unresolved ones)
 - [ ] Phase-2 roadmap items trace to PP/OPS/BUG sources

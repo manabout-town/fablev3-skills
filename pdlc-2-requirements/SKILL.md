@@ -24,7 +24,7 @@ Read `references/templates.md` and follow the templates.
 
 ### 1. Personas (2–3)
 
-Start from the stage-1 actors. One primary + 1–2 secondary. Build each around **behavior and goals**, not demographic trivia: current behavior (what this person does in the AS-IS), goals (JTBD, Jobs to be Done), frustrations (linked PP IDs), tech fluency, one defining quote. Give each persona 2–3 explicit hypotheses to test — these feed the interview design.
+Start from the stage-1 actors. One primary + 1–2 secondary. Build each around **behavior and goals**, not demographic trivia: current behavior (what this person does in the AS-IS), goals (JTBD, Jobs to be Done), frustrations (linked PP IDs), tech fluency, one defining quote. Give each persona 2–3 explicit hypotheses to test — these feed the interview design. If the brief carries 확장 가설(OPP-###), assign each OPP to the persona best positioned to falsify it and include it among that persona's hypotheses — an OPP nobody interviews about is a fantasy, not a hypothesis.
 
 ### 2. Interview design and execution
 
@@ -39,8 +39,9 @@ Start from the stage-1 actors. One primary + 1–2 secondary. Build each around 
 ### 3. Write the BRD
 
 - Split into functional requirements (FR) and non-functional requirements (NFR), each with a REQ-### ID.
-- Every REQ gets an **evidence column**: which PP or INS it came from. Delete evidence-free REQs or confirm their origin with the user.
+- Every REQ gets an **evidence column**: which PP, INS, or OPP it came from. Delete evidence-free REQs or confirm their origin with the user.
 - Prioritize with MoSCoW (Must/Should/Could/Won't). Always fill in Won't — naming what you will not do is your scope defense line.
+- **OPP handling**: an OPP whose interview verdict is *supported* may enter as Should/Could (Must only with the user's explicit call); *contradicted* → record in Won't with the verdict as the reason; *untested* → Could at most, flagged "미검증". This keeps expansive ideas alive without letting them bloat the 3-feature MVP.
 - Define 2–3 service-level KPIs (concretizing the brief's success criteria).
 - Since stage 5 implements only **3 core features**, warn now if Musts are bloated. Musts should be coverable by 3 features (roughly 5–8 REQs).
 
