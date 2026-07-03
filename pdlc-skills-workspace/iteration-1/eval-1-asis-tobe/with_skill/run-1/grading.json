@@ -1,0 +1,42 @@
+{
+  "expectations": [
+    {
+      "text": "Doc at convention path docs/01-process-analysis.md",
+      "passed": true,
+      "evidence": "docs/01-process-analysis.md"
+    },
+    {
+      "text": "Pain points have PP-### IDs + evidence + cause analysis",
+      "passed": true,
+      "evidence": "PP IDs: ['PP-001', 'PP-002', 'PP-003', 'PP-004', 'PP-005', 'PP-006', 'PP-007'], cause-analysis section: True"
+    },
+    {
+      "text": "Two Mermaid flowcharts (AS-IS, TO-BE)",
+      "passed": true,
+      "evidence": "2 mermaid blocks"
+    },
+    {
+      "text": "TO-BE ↔ PP mapping table with out-of-scope PPs",
+      "passed": true,
+      "evidence": "mapping+scope-out language present"
+    },
+    {
+      "text": "Quantitative expected-effects table",
+      "passed": true,
+      "evidence": "expected-effects table found"
+    },
+    {
+      "text": "State: stage1 done, current_stage 2",
+      "passed": true,
+      "evidence": "stage1=done, current=2, outputs=['docs/01-process-analysis.md']"
+    }
+  ],
+  "pass_count": 6,
+  "total": 6,
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

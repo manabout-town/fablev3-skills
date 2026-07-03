@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "project": {
+    "name": "RunMate (러닝 크루 매칭 앱)",
+    "one_liner": "지역·페이스·시간대가 맞는 러닝 크루를 찾아 러너와 연결해 주는 매칭 서비스",
+    "type": "side-project",
+    "created_at": "2026-07-02"
+  },
+  "current_stage": 1,
+  "stages": {
+    "1": { "name": "asis-tobe",    "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "2": { "name": "requirements", "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "3": { "name": "spec",         "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "4": { "name": "sprint-plan",  "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "5": { "name": "build",        "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "6": { "name": "qa",           "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "7": { "name": "ops",          "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "8": { "name": "portfolio",    "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false }
+  },
+  "decisions": [
+    { "date": "2026-07-02", "stage": 0, "decision": "비대화형 킥오프 — 서비스명(RunMate 가칭), 타깃(러너+크루 운영자 양면), 필터 기반 매칭 MVP, 반응형 웹 등 10개 항목을 가정으로 확정", "reason": "비대화형 실행 환경으로 사용자 인터뷰 불가. 가정 목록은 00-project-brief.md 부록에 기록" },
+    { "date": "2026-07-02", "stage": 0, "decision": "실시간 채팅·GPS 트래킹·결제·네이티브 앱을 범위 밖으로 확정", "reason": "6주 1인 프로젝트에서 8단계 완주가 최우선 목표이므로 구현 범위 최소화" }
+  ],
+  "risks": [
+    { "id": "RISK-001", "description": "6주 내 8단계 완주 — 1인 프로젝트에서 5단계(구현)가 일정을 잠식하면 6~8단계가 부실해질 위험", "mitigation": "4단계에서 핵심 기능 3개로 구현 범위를 고정하고, 주차별 마일스톤에 exit criteria를 명시해 범위 확장을 차단", "status": "open" },
+    { "id": "RISK-002", "description": "비대화형 킥오프의 가정(서비스명, 타깃, 매칭 방식)이 사용자 의도와 다를 위험", "mitigation": "1단계 시작 전 00-project-brief.md 부록의 가정 목록을 사용자에게 리뷰받고, 변경 시 관련 단계 stale 처리", "status": "open" },
+    { "id": "RISK-003", "description": "양면(러너/크루 운영자) 서비스 특성상 2~3단계에서 요구사항이 양쪽으로 팽창할 위험", "mitigation": "MVP는 수요 측(러너의 탐색·가입)을 우선하고, 크루 운영자 기능은 등록·신청 관리 최소 기능으로 한정", "status": "open" }
+  ]
+}

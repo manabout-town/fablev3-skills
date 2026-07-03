@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "project": {
+    "name": "단골도장",
+    "one_liner": "동네 카페 사장님을 위한 디지털 단골 쿠폰 서비스",
+    "type": "side-project",
+    "created_at": "2026-07-01"
+  },
+  "current_stage": 5,
+  "stages": {
+    "1": { "name": "asis-tobe",    "status": "done", "completed_at": "2026-07-02", "outputs": ["docs/01-process-analysis.md"], "summary": "수기 쿠폰 관리의 PP 6개 도출, TO-BE 매핑", "stale": false },
+    "2": { "name": "requirements", "status": "done", "completed_at": "2026-07-03", "outputs": ["docs/02-requirements/personas.md", "docs/02-requirements/interviews.md", "docs/02-requirements/brd.md"], "summary": "REQ 6개(Must 4) 확정", "stale": false },
+    "3": { "name": "spec",         "status": "done", "completed_at": "2026-07-04", "outputs": ["docs/03-spec/functional-spec.md", "docs/03-spec/screen-design.md", "docs/03-spec/policies.md"], "summary": "FEAT 6개, ★ 후보 4개", "stale": false },
+    "4": { "name": "sprint-plan",  "status": "done", "completed_at": "2026-07-04", "outputs": ["docs/04-sprint-plan/sprint-plan.md", "docs/04-sprint-plan/gantt-chart.html"], "summary": "2주x3 스프린트, ★ 4개 Must 배치, 마일스톤 M1~M4, FEAT-005 스트레치", "stale": false },
+    "5": { "name": "build",        "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "6": { "name": "qa",           "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "7": { "name": "ops",          "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "8": { "name": "portfolio",    "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false }
+  },
+  "decisions": [
+    { "date": "2026-07-03", "stage": 2, "decision": "알림 기능을 Could로 강등", "reason": "인터뷰에서 사장님들이 알림 피로 우려" }
+  ],
+  "risks": [
+    { "date": "2026-07-04", "stage": 4, "risk": "1인 겸임으로 가용 시간 변동", "mitigation": "스프린트당 1~1.5d 버퍼, 스트레치(FEAT-005) 우선 드롭" },
+    { "date": "2026-07-04", "stage": 4, "risk": "QR 스캔 UX 복잡도(카메라 권한, 브라우저 편차)", "mitigation": "1차는 QR→URL 접속 방식으로 단순화" },
+    { "date": "2026-07-04", "stage": 4, "risk": "파일럿 매장 섭외 지연", "mitigation": "Sprint 2 중 후보 매장 사전 접촉" }
+  ]
+}

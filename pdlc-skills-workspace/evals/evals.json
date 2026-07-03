@@ -1,0 +1,29 @@
+{
+  "skill_name": "pdlc-pipeline-suite",
+  "evals": [
+    {
+      "id": 0,
+      "name": "orchestrator-kickoff",
+      "skill": "pdlc-pipeline",
+      "prompt": "러닝 크루 매칭 앱 프로젝트를 시작하려고 해. 킥오프하고 파이프라인 세팅해줘. 6주짜리 1인 사이드 프로젝트고, 목표는 포트폴리오까지 완성하는 거야.",
+      "expected_output": "docs/00-project-brief.md (한 줄 정의/범위 밖/제약/성공 기준 포함) + docs/pipeline-state.json (8단계 스키마 준수) + 1단계 안내",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "asis-tobe-analysis",
+      "skill": "pdlc-1-asis-tobe",
+      "prompt": "1단계 진행하자. 동네 카페 사장님이 종이 쿠폰으로 단골 관리하는 현행 프로세스를 분석하고 AS-IS/TO-BE 문서를 만들어줘.",
+      "expected_output": "docs/01-process-analysis.md — PP ID+근거+원인, Mermaid 2개, TO-BE 매핑표, 기대효과 표, 상태 파일 갱신",
+      "files": ["fixtures/kickoff-done"]
+    },
+    {
+      "id": 2,
+      "name": "sprint-plan-gantt",
+      "skill": "pdlc-4-sprint-plan",
+      "prompt": "4단계 진행하자. 스프린트 계획 세우고 간트차트 만들어줘. 2026-07-06 시작으로.",
+      "expected_output": "핵심 기능 3개 확정(★ 4개 중 탈락 사유 포함), milestones.md(exit criteria), gantt.md(Mermaid crit), gantt.html(자체 동작), 상태 파일 갱신",
+      "files": ["fixtures/spec-done"]
+    }
+  ]
+}

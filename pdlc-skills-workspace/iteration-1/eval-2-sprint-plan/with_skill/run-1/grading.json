@@ -1,0 +1,42 @@
+{
+  "expectations": [
+    {
+      "text": "Core 3 features finalized with elimination rationale",
+      "passed": true,
+      "evidence": "picked123=True, elimination-rationale=True, explicit-3=True"
+    },
+    {
+      "text": "Milestones have verifiable exit criteria",
+      "passed": true,
+      "evidence": "verifiable exit criteria found"
+    },
+    {
+      "text": "Mermaid gantt with deps + crit marking",
+      "passed": true,
+      "evidence": "gantt+after=True, crit=True"
+    },
+    {
+      "text": "Self-contained gantt HTML (no CDN)",
+      "passed": true,
+      "evidence": "docs/04-plan/gantt.html; external CDN: False"
+    },
+    {
+      "text": "Explicit 15-20% buffer",
+      "passed": true,
+      "evidence": "explicit buffer % found"
+    },
+    {
+      "text": "State: stage4 done, current_stage 5, decision recorded",
+      "passed": true,
+      "evidence": "stage4=done, current=5, decisions=3"
+    }
+  ],
+  "pass_count": 6,
+  "total": 6,
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

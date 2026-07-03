@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "pdlc-pipeline-suite", "runs": [{"id": "eval-0-kickoff-with_skill", "prompt": "\ub7ec\ub2dd \ud06c\ub8e8 \ub9e4\uce6d \uc571 \ud504\ub85c\uc81d\ud2b8\ub97c \uc2dc\uc791\ud558\ub824\uace0 \ud574. \ud0a5\uc624\ud504\ud558\uace0 \ud30c\uc774\ud504\ub77c\uc778 \uc138\ud305\ud574\uc918. 6\uc8fc\uc9dc\ub9ac 1\uc778 \uc0ac\uc774\ub4dc \ud504\ub85c\uc81d\ud2b8\uace0, \ubaa9\ud45c\ub294 \ud3ec\ud2b8\ud3f4\ub9ac\uc624\uae4c\uc9c0 \uc644\uc131\ud558\ub294 \uac70\uc57c.", "eval_id": 0, "outputs": [{"name": "RUN_SUMMARY.md", "type": "text", "content": "# RUN_SUMMARY \u2014 PDLC \ud30c\uc774\ud504\ub77c\uc778 \ud0a5\uc624\ud504 (\ub7ec\ub2dd \ud06c\ub8e8 \ub9e4\uce6d \uc571)\n\n\uc2e4\ud589\uc77c: 2026-07-02 | \uc0ac\uc6a9 \uc2a4\ud0ac: `pdlc-pipeline` (\uc624\ucf00\uc2a4\ud2b8\ub808\uc774\ud130) | \uc2e4\ud589 \uc6cc\ud06c\ud50c\ub85c\uc6b0: **A. \ud0a5\uc624\ud504**\n\n## \uc0ac\uc6a9\uc790 \uc694\uccad\n\n\"\ub7ec\ub2dd \ud06c\ub8e8 \ub9e4\uce6d \uc571 \ud504\ub85c\uc81d\ud2b8\ub97c \uc2dc\uc791\ud558\ub824\uace0 \ud574. \ud0a5\uc624\ud504\ud558\uace0 \ud30c\uc774\ud504\ub77c\uc778 \uc138\ud305\ud574\uc918. 6\uc8fc\uc9dc\ub9ac 1\uc778 \uc0ac\uc774\ub4dc \ud504\ub85c\uc81d\ud2b8\uace0, \ubaa9\ud45c\ub294 \ud3ec\ud2b8\ud3f4\ub9ac\uc624\uae4c\uc9c0 \uc644\uc131\ud558\ub294 \uac70\uc57c.\"\n\n## \uc0b0\ucd9c\ubb3c\n\n| \ud30c\uc77c | \ub0b4\uc6a9 |\n|---|---|\n| `docs/00-project-brief.md` | \ud504\ub85c\uc81d\ud2b8 \ube0c\ub9ac\ud504 \u2014 \ud55c \uc904 \uc815\uc758, \ubc30\uacbd, \ubaa9\ud45c(\ube44\uc988\ub2c8\uc2a4/\uc0ac\uc6a9\uc790/\ud3ec\ud2b8\ud3f4\ub9ac\uc624), \ubc94\uc704 \ubc16, \uc81c\uc57d \uc870\uac74(6\uc8fc\u00b71\uc778\u00b7Next.js+Supabase), \uc131\uacf5 \uae30\uc900 3\uac1c. \ubd80\ub85d\uc5d0 \ube44\ub300\ud654\ud615 \uac00\uc815 10\uac74(A1~A10) \uba85\uc2dc \uae30\ub85d |\n| `docs/pipeline-state.json` | \ud30c\uc774\ud504\ub77c\uc778 \uc0c1\ud0dc \ucd08\uae30\ud654 \u2014 8\ub2e8\uacc4 \uc804\ubd80 `pending`, `current_stage: 1`, `type: side-project`. \ud0a5\uc624\ud504 \uc758\uc0ac\uacb0\uc815 2\uac74\uacfc \ub9ac\uc2a4\ud06c 3\uac74(RISK-001~003) \uae30\ub85d |\n| `RUN_SUMMARY.md` | \uc774 \ubb38\uc11c |\n\n## \ub530\ub978 \uc2a4\ud0ac \uc9c0\uce68\n\n1. **\ucc38\uc870 \ubb38\uc11c \uc120\ud589 \ub3c5\ud574**: `SKILL.md`\uac00 \uc9c0\uc2dc\ud55c \ub300\ub85c \uc0c1\ud0dc \ud30c\uc77c \uc0dd\uc131 \uc804 `references/conventions.md`\ub97c \uc77d\uace0 \ub514\ub809\ud1a0\ub9ac \uad6c\uc870, pipeline-state.json \uc2a4\ud0a4\ub9c8, ID \uccb4\uacc4, project-brief \ud15c\ud50c\ub9bf\uc744 \uc900\uc218\ud568.\n2. **\ud0a5\uc624\ud504 \uc6cc\ud06c\ud50c\ub85c\uc6b0 A**: (1) \uc778\ud130\ubdf0 \ud56d\ubaa9 4\uac1c(\ud55c \uc904 \uc815\uc758 / \ud504\ub85c\uc81d\ud2b8 \uc131\uaca9 / \uae30\uac04\u00b7\ud300 / \ub3c4\uba54\uc778 \uc81c\uc57d) \ud655\uc815 \u2192 (2) `docs/00-project-brief.md` \uc791\uc131(\uaddc\uc57d \u00a76 \ud15c\ud50c\ub9bf \uc900\uc218) \u2192 (3) `docs/pipeline-state.json` \ucd08\uae30\ud654(\uaddc\uc57d \u00a72 \uc2a4\ud0a4\ub9c8, \ubaa8\ub4e0 \ub2e8\uacc4 pending, current_stage: 1) \u2192 (4) 1\ub2e8\uacc4 \uc2dc\uc791 \uc5ec\ubd80 \uc9c8\ubb38(\uc544\ub798 \ucc38\uc870).\n3. **\uc5b8\uc5b4 \uaddc\uce59**: \ud55c\uad6d\uc5b4 \ubcf8\ubb38 + \uc5c5\uacc4 \uc6a9\uc5b4 \uccab \ub4f1\uc7a5 \uc2dc \uc601\uc5b4 \ubcd1\uae30(scope defense, exit criteria \ub4f1).\n4. **\uc0c1\ud0dc \ud30c\uc77c \ub2e8\uc77c \uc9c4\uc2e4 \uacf5\uae09\uc6d0 \uc6d0\uce59**: \uc0c1\ud0dc \ubcc0\uacbd\uc740 \uc2a4\ud0ac \uc6cc\ud06c\ud50c\ub85c\uc6b0 \ub0b4\uc5d0\uc11c\ub9cc \uc218\ud589, \uc0ac\uc6a9\uc790\uc5d0\uac8c \uc218\ub3d9 \uc218\uc815 \uc694\uad6c\ud558\uc9c0 \uc54a\uc74c.\n5. **\ud55c \uc138\uc158\uc5d0 \ud30c\uc774\ud504\ub77c\uc778 \uc804\uccb4\ub97c \ub05d\ub0b4\uc9c0 \uc54a\uae30**: \ud0a5\uc624\ud504\uae4c\uc9c0\ub9cc \uc218\ud589\ud558\uace0 1\ub2e8\uacc4 \uc0b0\ucd9c\ubb3c\uc740 \ub9cc\ub4e4\uc9c0 \uc54a\uc74c (\uc0ac\uc6a9\uc790 \uc694\uccad \ubc94\uc704\ub3c4 \"\ud0a5\uc624\ud504 + \uc138\ud305\").\n6. **decisions/risks \uae30\ub85d**: \ud0a5\uc624\ud504 \uc2dc\uc810\uc758 \ubc94\uc704 \uacb0\uc815\uacfc \uac00\uc815\uc744 `decisions` \ubc30\uc5f4\uc5d0, 6\uc8fc \uc644\uc8fc\u00b7\uac00\uc815 \ubd88\uc77c\uce58\u00b7\uc694\uad6c \ud33d\ucc3d \ub9ac\uc2a4\ud06c\ub97c `risks` \ubc30\uc5f4\uc5d0 \uae30\ub85d.\n\n## \ub530\ub97c \uc218 \uc5c6\uc5c8\ub358 / \uc870\uc815\ud55c \uc9c0\uce68\n\n1. **\ub300\ud654\ud615 \uc778\ud130\ubdf0 \ubd88\uac00**: \uc2a4\ud0ac\uc740 \"\ud55c \ubc88\uc5d0 \ubab0\uc544 \ubb3b\uc9c0 \ub9d0\uace0 \ub300\ud654\ub85c \ud480\uc5b4\ub77c\"\ub77c\uace0 \uc9c0\uc2dc\ud558\uc9c0\ub9cc, \ubcf8 \uc2e4\ud589\uc740 \ube44\ub300\ud654\ud615\uc774\ub77c \uc778\ud130\ubdf0\ub97c \uc9c4\ud589\ud560 \uc218 \uc5c6\uc5c8\uc74c. \u2192 \uc0ac\uc6a9\uc790 \uba54\uc2dc\uc9c0\uc5d0\uc11c \ud655\uc815 \uac00\ub2a5\ud55c \uac12(6\uc8fc, 1\uc778, \uc0ac\uc774\ub4dc \ud504\ub85c\uc81d\ud2b8, \ud3ec\ud2b8\ud3f4\ub9ac\uc624 \ubaa9\ud45c)\uc740 \uadf8\ub300\ub85c \ubc18\uc601\ud558\uace0, \ub098\uba38\uc9c0(\uc11c\ube44\uc2a4\uba85, \ud0c0\uae43 \uc138\uadf8\uba3c\ud2b8, \ub9e4\uce6d \ubc29\uc2dd, \ud50c\ub7ab\ud3fc \ub4f1)\ub294 \ud569\ub9ac\uc801 \uac00\uc815\uc73c\ub85c \ud655\uc815\ud55c \ub4a4 **\uac00\uc815 10\uac74\uc744 `00-project-brief.md` \ubd80\ub85d \ud45c\uc5d0 \uba85\uc2dc \uae30\ub85d**\ud568. \uac00\uc815 \ubd88\uc77c\uce58 \uc704\ud5d8\uc740 RISK-002\ub85c \ub4f1\uc7ac.\n2. **\"1\ub2e8\uacc4\ub97c \uc2dc\uc791\ud560\uc9c0 \ubb3c\uc5b4\ubcf8\ub2e4\" (\uc6cc\ud06c\ud50c\ub85c\uc6b0 A-4)**: \ube44\ub300\ud654\ud615\uc774\ubbc0\ub85c \uc2e4\uc81c \uc9c8\ubb38/\uc751\ub2f5\uc774 \ubd88\uac00\ub2a5. \u2192 \uc9c8\ubb38\uc744 \uc5ec\uae30 \uae30\ub85d\ud558\ub294 \uac83\uc73c\ub85c \uac08\uc74c: **\ub2e4\uc74c \ub2e8\uacc4\ub294 1\ub2e8\uacc4 `pdlc-1-asis-tobe`(AS-IS/TO-BE \ud504\ub85c\uc138\uc2a4 \ubd84\uc11d)\uc774\uba70, \uc2dc\uc791 \uc2dc `docs/00-project-brief.md`\ub97c \uc785\ub825\uc73c\ub85c \uc0ac\uc6a9\ud55c\ub2e4. \uc9c4\ud589\ud560\uae4c\uc694?** \uc0ac\uc6a9\uc790 \ud655\uc778 \uc804\uc774\ubbc0\ub85c 1\ub2e8\uacc4 status\ub294 `pending`\uc73c\ub85c \uc720\uc9c0\ud568.\n\n## \ub2e4\uc74c \ub2e8\uacc4 \uc548\ub0b4\n\n- **\ud604\uc7ac \uc704\uce58**: `current_stage: 1` \u2014 1\ub2e8\uacc4(AS-IS/TO-BE \ud504\ub85c\uc138\uc2a4 \ubd84\uc11d) \uc2dc\uc791 \ub300\uae30.\n- **\uad8c\uc7a5 \uc120\ud589 \uc791\uc5c5**: `00-project-brief.md` \ubd80\ub85d\uc758 \uac00\uc815 A1~A10 \ub9ac\ubdf0 (\ud2b9\ud788 \uc11c\ube44\uc2a4\uba85, \ud0c0\uae43, \ub9e4\uce6d \ubc29\uc2dd).\n- **1\ub2e8\uacc4\uac00 \uc77d\uc744 \uc785\ub825**: `docs/00-project-brief.md`. \uc0b0\ucd9c\ubb3c\uc740 `docs/01-process-analysis.md` (Mermaid \ud50c\ub85c\uc6b0\ucc28\ud2b8 2\uac1c + PP-### pain point \ud544\uc218 \u2014 \uac8c\uc774\ud2b8 \uccb4\ud06c\ub9ac\uc2a4\ud2b8 \u00a75-1).\n"}], "grading": {"expectations": [{"text": "Project brief at docs/00-project-brief.md with \ud55c \uc904 \uc815\uc758/Out of Scope/\uc81c\uc57d/\uc131\uacf5 \uae30\uc900", "passed": true, "evidence": "file docs/00-project-brief.md; missing sections: none"}, {"text": "pipeline-state.json matches 8-stage schema", "passed": true, "evidence": "keys: ['current_stage', 'decisions', 'project', 'risks', 'stages', 'version']; stages: ['1', '2', '3', '4', '5', '6', '7', '8']"}, {"text": "Assumptions explicitly recorded", "passed": true, "evidence": "15 mentions of \uac00\uc815/assumption"}, {"text": "Guides user to stage 1 (AS-IS/TO-BE) next", "passed": true, "evidence": "mentions 1\ub2e8\uacc4/AS-IS next"}], "pass_count": 4, "total": 4, "summary": {"passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0}}}, {"id": "eval-0-kickoff-without_skill", "prompt": "\ub7ec\ub2dd \ud06c\ub8e8 \ub9e4\uce6d \uc571 \ud504\ub85c\uc81d\ud2b8\ub97c \uc2dc\uc791\ud558\ub824\uace0 \ud574. \ud0a5\uc624\ud504\ud558\uace0 \ud30c\uc774\ud504\ub77c\uc778 \uc138\ud305\ud574\uc918. 6\uc8fc\uc9dc\ub9ac 1\uc778 \uc0ac\uc774\ub4dc \ud504\ub85c\uc81d\ud2b8\uace0, \ubaa9\ud45c\ub294 \ud3ec\ud2b8\ud3f4\ub9ac\uc624\uae4c\uc9c0 \uc644\uc131\ud558\ub294 \uac70\uc57c.", "eval_id": 0, "outputs": [{"name": "README.md", "type": "text", "content": "# \ub7ec\ub2dd \ud06c\ub8e8 \ub9e4\uce6d \uc571 \u2014 \"RunMate\" (\uac00\uce6d)\n\n> 6\uc8fc \uc644\uc131 1\uc778 \uc0ac\uc774\ub4dc \ud504\ub85c\uc81d\ud2b8 \u00b7 \ucd5c\uc885 \ubaa9\ud45c: \ubc30\ud3ec\ub41c \uc11c\ube44\uc2a4 + \ud3ec\ud2b8\ud3f4\ub9ac\uc624 \ubb38\uc11c\ud654\n\n- **\ud0a5\uc624\ud504\uc77c**: 2026-07-02 (\uc218)\n- **\ucd5c\uc885 \ub9c8\uac10**: 2026-08-12 (\uc218) \u2014 6\uc8fc\ucc28 \uc885\ub8cc\n- **\uc9c4\ud589\uc790**: \ubc15\ud6a8\uade0 (\uae30\ud68d \u00b7 \ub514\uc790\uc778 \u00b7 \uac1c\ubc1c \u00b7 \uc6b4\uc601 1\uc778)\n\n## \ubb38\uc11c \uc778\ub371\uc2a4\n\n| \ub2e8\uacc4 | \ubb38\uc11c | \ub0b4\uc6a9 |\n|---|---|---|\n| \ud0a5\uc624\ud504 | [01-kickoff/project-charter.md](01-kickoff/project-charter.md) | \ud504\ub85c\uc81d\ud2b8 \ud5cc\uc7a5: \ubaa9\ud45c, \ubc94\uc704, \uc131\uacf5 \uae30\uc900, \ub9ac\uc2a4\ud06c |\n| \ud0a5\uc624\ud504 | [01-kickoff/prd-mvp.md](01-kickoff/prd-mvp.md) | MVP \uc81c\ud488 \uc694\uad6c\uc0ac\ud56d (\ud398\ub974\uc18c\ub098, \uc720\uc800 \ud50c\ub85c\uc6b0, \uae30\ub2a5 \uba85\uc138) |\n| \uacc4\ud68d | [02-plan/roadmap-6weeks.md](02-plan/roadmap-6weeks.md) | \uc8fc\ucc28\ubcc4 \ub85c\ub4dc\ub9f5 + \ub9c8\uc77c\uc2a4\ud1a4 + \uc8fc\uac04 \uc6b4\uc601 \ub9ac\ub4ec |\n| \uacc4\ud68d | [02-plan/backlog.md](02-plan/backlog.md) | \uc6b0\uc120\uc21c\uc704\ud654\ub41c \uc720\uc800 \uc2a4\ud1a0\ub9ac \ubc31\ub85c\uadf8 (P0/P1/P2) |\n| \ud30c\uc774\ud504\ub77c\uc778 | [03-pipeline/tech-stack.md](03-pipeline/tech-stack.md) | \uae30\uc220 \uc2a4\ud0dd \uacb0\uc815 \uae30\ub85d (ADR) |\n| \ud30c\uc774\ud504\ub77c\uc778 | [03-pipeline/dev-pipeline.md](03-pipeline/dev-pipeline.md) | Git \uc804\ub7b5, CI/CD, \ubc30\ud3ec, \ud658\uacbd \uad6c\uc131 |\n| \ud30c\uc774\ud504\ub77c\uc778 | [03-pipeline/ci.yml](03-pipeline/ci.yml) | GitHub Actions CI \uc6cc\ud06c\ud50c\ub85c \ud15c\ud50c\ub9bf |\n| \ud3ec\ud2b8\ud3f4\ub9ac\uc624 | [04-portfolio/portfolio-plan.md](04-portfolio/portfolio-plan.md) | \ud3ec\ud2b8\ud3f4\ub9ac\uc624 \uc0b0\ucd9c\ubb3c \ubaa9\ub85d + \uc791\uc131 \uc77c\uc815 |\n\n## \ud55c\ub208\uc5d0 \ubcf4\ub294 \uacc4\ud68d\n\n```\n1\uc8fc\ucc28  \uae30\ud68d \ud655\uc815 + \ub514\uc790\uc778 + \ud504\ub85c\uc81d\ud2b8 \uc2a4\uce90\ud3f4\ub529/\ud30c\uc774\ud504\ub77c\uc778 \uac00\ub3d9\n2\uc8fc\ucc28  \uc778\uc99d + \ud504\ub85c\ud544 (\uc628\ubcf4\ub529 \uc644\uc131)\n3\uc8fc\ucc28  \ud06c\ub8e8 \uc0dd\uc131/\ud0d0\uc0c9/\ud544\ud130 (\ud575\uc2ec \ub3c4\uba54\uc778)\n4\uc8fc\ucc28  \ub9e4\uce6d(\uac00\uc785 \uc2e0\uccad/\uc2b9\uc778) + \ub7ec\ub2dd \uc138\uc158 \uc77c\uc815\n5\uc8fc\ucc28  \ubc84\ud37c + \ud3f4\ub9ac\uc2f1 + \ubc30\ud3ec \uc548\uc815\ud654\n6\uc8fc\ucc28  \ud3ec\ud2b8\ud3f4\ub9ac\uc624 \ubb38\uc11c\ud654 + \ub370\ubaa8 \uc601\uc0c1 + \ud68c\uace0\n```\n\n## \uccab \uc561\uc158 (\uc624\ub298 \ud560 \uc77c)\n\n1. `project-charter.md` \uc77d\uace0 \ubc94\uc704\uc5d0 \ub3d9\uc758\ud558\ub294\uc9c0 \uc2a4\uc2a4\ub85c \ud655\uc778 \u2014 \ube7c\uace0 \uc2f6\uc740 \uac83 \uc788\uc73c\uba74 \uc9c0\uae08 \ube7c\uae30\n2. GitHub \uc800\uc7a5\uc18c \uc0dd\uc131 (`runmate`) \u2192 `03-pipeline/dev-pipeline.md`\uc758 \ucd08\uae30 \uc138\ud305 \uc808\ucc28 \uc2e4\ud589\n3. 1\uc8fc\ucc28 \ubc31\ub85c\uadf8(P0) \ud2f0\ucf13\uc744 GitHub Issues/Projects\uc5d0 \ub4f1\ub85d\n"}], "grading": {"expectations": [{"text": "Project brief at docs/00-project-brief.md with \ud55c \uc904 \uc815\uc758/Out of Scope/\uc81c\uc57d/\uc131\uacf5 \uae30\uc900", "passed": false, "evidence": "no docs/00-project-brief.md"}, {"text": "pipeline-state.json matches 8-stage schema", "passed": false, "evidence": "no pipeline-state.json"}, {"text": "Assumptions explicitly recorded", "passed": false, "evidence": "0 mentions of \uac00\uc815/assumption"}, {"text": "Guides user to stage 1 (AS-IS/TO-BE) next", "passed": false, "evidence": "no stage-1 guidance found"}], "pass_count": 0, "total": 4, "summary": {"passed": 0, "failed": 4, "total": 4, "pass_rate": 0.0}}}, {"id": "eval-1-asis-tobe-with_skill", "prompt": "1\ub2e8\uacc4 \uc9c4\ud589\ud558\uc790. \ub3d9\ub124 \uce74\ud398 \uc0ac\uc7a5\ub2d8\uc774 \uc885\uc774 \ucfe0\ud3f0\uc73c\ub85c \ub2e8\uace8 \uad00\ub9ac\ud558\ub294 \ud604\ud589 \ud504\ub85c\uc138\uc2a4\ub97c \ubd84\uc11d\ud558\uace0 AS-IS/TO-BE \ubb38\uc11c\ub97c \ub9cc\ub4e4\uc5b4\uc918.", "eval_id": 1, "outputs": [{"name": "RUN_SUMMARY.md", "type": "text", "content": "# RUN_SUMMARY \u2014 pdlc-1-asis-tobe (with_skill, non-interactive)\n\n## \uc2e4\ud589 \uac1c\uc694\n- \uc2e4\ud589\uc77c: 2026-07-02\n- \uc2a4\ud0ac: `/Users/park/Desktop/fablev3-skills/pdlc-1-asis-tobe/SKILL.md` + `references/template.md`\n- \ud0dc\uc2a4\ud06c: \"1\ub2e8\uacc4 \uc9c4\ud589\ud558\uc790. \ub3d9\ub124 \uce74\ud398 \uc0ac\uc7a5\ub2d8\uc774 \uc885\uc774 \ucfe0\ud3f0\uc73c\ub85c \ub2e8\uace8 \uad00\ub9ac\ud558\ub294 \ud604\ud589 \ud504\ub85c\uc138\uc2a4\ub97c \ubd84\uc11d\ud558\uace0 AS-IS/TO-BE \ubb38\uc11c\ub97c \ub9cc\ub4e4\uc5b4\uc918.\"\n- \ud53d\uc2a4\ucc98: `fixtures/kickoff-done/` (00-project-brief.md, pipeline-state.json) \u2192 \ud504\ub85c\uc81d\ud2b8 \ub8e8\ud2b8\ub85c \ubcf5\uc0ac \ud6c4 \uc2dc\uc791\n\n## \uc0b0\ucd9c\ubb3c\n| \ud30c\uc77c | \ub0b4\uc6a9 |\n|---|---|\n| `docs/01-process-analysis.md` | AS-IS/TO-BE \ud504\ub85c\uc138\uc2a4 \ubd84\uc11d\uc11c v1.0 (\ud15c\ud50c\ub9bf \uad6c\uc870 \uadf8\ub300\ub85c \uc900\uc218) |\n| `docs/pipeline-state.json` | 1\ub2e8\uacc4 `done` + `completed_at` + `outputs` + `summary`, `current_stage: 2`, RISK-001~003\uc744 `risks`\uc5d0, \ubc94\uc704 \uacb0\uc815 DEC-001\uc744 `decisions`\uc5d0 \ubc18\uc601 |\n| `docs/00-project-brief.md` | \ud53d\uc2a4\ucc98 \uc6d0\ubcf8 \uadf8\ub300\ub85c (\uc218\uc815 \uc5c6\uc74c, \uc785\ub825\uc73c\ub85c\ub9cc \uc0ac\uc6a9) |\n\n## \uc2a4\ud0ac \uc6cc\ud06c\ud50c\ub85c\uc6b0 \uc218\ud589 \ub0b4\uc5ed\n1. \ubd84\uc11d \ub300\uc0c1 \ud655\uc815 \u2014 brief \uae30\ubc18\uc73c\ub85c \"1\uc778 \uce74\ud398 \uc0ac\uc7a5\ub2d8\uc758 \uc885\uc774 \ucfe0\ud3f0 \ub2e8\uace8 \uad00\ub9ac\" \ud504\ub85c\uc138\uc2a4\ub85c \ud655\uc815 (\ub300\ud654 \ubd88\uac00 \u2192 \uac00\uc815\uc73c\ub85c \ub300\uccb4)\n2. AS-IS \ubd84\ud574 \u2014 6\ub2e8\uacc4, \uac01 \ub2e8\uacc4\uc5d0 \ud589\uc704\uc790\u00b7\ub3c4\uad6c\u00b7\uc18c\uc694 \uc2dc\uac04\u00b7\ubb38\uc81c\uc810 \uae30\uc7ac\n3. Pain Point \u2014 PP-001~PP-007 (7\uac1c, \uc801\uc815 \ubc94\uc704 5~10 \ucda9\uc871), \uac01\uac01 \uc815\ub7c9/\uc815\uc131 \uadfc\uac70 + 5 Whys 1~2 depth \uc6d0\uc778 \ubd84\uc11d + \uc2ec\uac01\ub3c4\n4. TO-BE \uc124\uacc4 \u2014 8\ub2e8\uacc4 \ubd84\ud574, \ub2e8\uacc4\u2194PP \ub9e4\ud551 \ud45c, \ubbf8\ud574\uc18c PP(PP-006 \uc77c\ubd80)\ub294 \uba85\uc2dc\uc801\uc73c\ub85c \ubc94\uc704 \ubc16 \ucc98\ub9ac. \uae30\uc220 \uad6c\ud604(\uc54c\ub9bc \ucc44\ub110, \uc2b9\uc778 \ubc29\uc2dd)\uc740 3\ub2e8\uacc4\ub85c \uc774\uad00\ud55c\ub2e4\uace0 \uba85\uc2dc\n5. \uc2dc\uac01\ud654 \u2014 Mermaid flowchart 2\uac1c(AS-IS, TO-BE), \ud589\uc704\uc790 2\uba85\uc774\ubbc0\ub85c subgraph\ub85c \uad6c\ubd84\n6. \uc815\ub7c9 \uae30\ub300\ud6a8\uacfc \u2014 6\uac1c \uc9c0\ud45c \ud45c (AS-IS \u2192 TO-BE \ubaa9\ud45c, \uc0b0\ucd9c \uadfc\uac70)\n7. \ub9c8\ubb34\ub9ac \u2014 pipeline-state.json \uac31\uc2e0, \ub2e4\uc74c \ub2e8\uacc4(pdlc-2-requirements) \uc5f0\uacb0 \ubc0f PP ID \ucc38\uc870 \uad00\uacc4\ub97c \ubb38\uc11c \u00a76\uc5d0 \uae30\uc7ac\n\n## \uc644\ub8cc \uae30\uc900 self-check\n- [x] AS-IS \ub2e8\uacc4\ubcc4 \ubd84\ud574 + \ud589\uc704\uc790\u00b7\ub3c4\uad6c\u00b7\uc2dc\uac04\n- [x] \ubaa8\ub4e0 PP\uc5d0 ID, \uc815\ub7c9/\uc815\uc131 \uadfc\uac70, \uc6d0\uc778 \ubd84\uc11d\n- [x] TO-BE\u2194PP \ub9e4\ud551 \ud45c (\ubbf8\ud574\uc18c PP \ubc94\uc704 \ubc16 \uba85\uc2dc)\n- [x] Mermaid \ud50c\ub85c\uc6b0\ucc28\ud2b8 2\uac1c\n- [x] \uc815\ub7c9 \uae30\ub300\ud6a8\uacfc \ud45c\n- [x] \uc5b8\uc5b4 \uaddc\uce59: \ud55c\uad6d\uc5b4 \ubcf8\ubb38 + \uccab \ub4f1\uc7a5 \uc6a9\uc5b4 \uc601\uc5b4 \ubcd1\uae30 (\uc608: \"\ud589\uc704\uc790(Actor)\", \"\ub370\uc2a4\ud06c \ub9ac\uc11c\uce58(Desk Research)\")\n\n## \ube44\ub300\ud654\ud615 \uc2e4\ud589\uc73c\ub85c \uc778\ud55c \uac00\uc815 (\ubb38\uc11c \u00a71.1~1.2\uc5d0\ub3c4 \uae30\ub85d)\n- \ub300\uc0c1 \ub9e4\uc7a5: \uc88c\uc11d 20\uc11d \uc774\ud558 1\uc778 \uc6b4\uc601 \uac1c\uc778 \uce74\ud398\n- \ucfe0\ud3f0 \uc815\ucc45: \ub3c4\uc7a5 10\uac1c \u2192 \uc74c\ub8cc 1\uc794 \ubb34\ub8cc\n- \uc77c \ubc29\ubb38 ~80\uba85, \uc801\ub9bd \uc2dc\ub3c4 ~30\uac74(40%), \uc7ac\ubc29\ubb38 \uc2dc \ucfe0\ud3f0 \ubbf8\uc9c0\ucc38\u00b7\ubd84\uc2e4 ~40% \ub4f1 \ubaa8\ub4e0 \uc218\uce58\ub294 \ucd94\uc815\uce58\ub85c \uba85\uc2dc\n- \uc791\uc131\uc790: \ubc15\ud6a8\uade0 (git user\uba85 \uc0ac\uc6a9)\n\n## \ub530\ub974\uc9c0 \ubabb\ud55c \uc2a4\ud0ac \uc9c0\uce68\n1. **\uc6cc\ud06c\ud50c\ub85c\uc6b0 1 \"\uc0ac\uc6a9\uc790\uc640 \ub300\ud654\ub85c \ubd84\uc11d \ub300\uc0c1\uc744 \uc881\ud78c\ub2e4\"** \u2014 \ube44\ub300\ud654\ud615 \uc2e4\ud589\uc774\ub77c \ub300\ud654 \ubd88\uac00. brief\uc640 \ud0dc\uc2a4\ud06c \ubb38\uc7a5\uc5d0\uc11c \ub300\uc0c1\uc774 \uba85\ud655\ud574 \uac00\uc815\uc73c\ub85c \ub300\uccb4\ud558\uace0 \ubb38\uc11c\uc5d0 \uac00\uc815 \ube14\ub85d\uc744 \ub0a8\uae40.\n2. **\uc6cc\ud06c\ud50c\ub85c\uc6b0 2 \"\uc2e4\ubb34 \ud504\ub85c\uc81d\ud2b8\uba74 \uc0ac\uc6a9\uc790\uc5d0\uac8c \uc2e4\uc81c \uc218\uce58\ub97c \ubb3b\ub294\ub2e4\"** \u2014 \uc9c8\ubb38 \ubd88\uac00. \ub2e4\ub9cc pipeline-state\uc758 project.type\uc774 `side-project`\ub77c \uc2a4\ud0ac \uaddc\uc815\uc0c1 \"\ud569\ub9ac\uc801 \ucd94\uc815 + \ucd94\uc815 \uba85\uc2dc\" \uacbd\ub85c\uac00 \uc815\ub2f9\ud558\uba70, \uadf8\ub300\ub85c \uc218\ud589\ud568 (\uc5c4\ubc00\ud788\ub294 \uc704\ubc18 \uc544\ub2d8).\n3. **\uc6cc\ud06c\ud50c\ub85c\uc6b0 7 \"\uc0ac\uc6a9\uc790 \ub9ac\ubdf0\ub97c \ubc1b\uace0 \ubc18\uc601\ud55c\ub2e4\"** \u2014 \ub9ac\ubdf0 \uc218\ub839 \ubd88\uac00. \ubb38\uc11c \uc0c1\ud0dc\ub97c `Draft`\ub85c \uc720\uc9c0\ud574 \ubbf8\ub9ac\ubdf0 \uc0c1\ud0dc\uc784\uc744 \ud45c\uc2dc\ud568. \ub9ac\ubdf0 \uc804\uc5d0 pipeline-state\ub97c `done`\uc73c\ub85c \uc62c\ub9b0 \uac83\uc740 \ud0dc\uc2a4\ud06c \uc644\uc8fc\ub97c \uc704\ud55c \uc808\ucda9\uc784.\n\n\uadf8 \uc678 \uc2a4\ud0ac\u00b7\ud15c\ud50c\ub9bf \uc9c0\uce68\uc740 \ubaa8\ub450 \uc900\uc218\ud588\uc73c\uba70, \uc2a4\ud0ac \ud30c\uc77c\uc740 \uc218\uc815\ud558\uc9c0 \uc54a\uc558\ub2e4.\n"}], "grading": {"expectations": [{"text": "Doc at convention path docs/01-process-analysis.md", "passed": true, "evidence": "docs/01-process-analysis.md"}, {"text": "Pain points have PP-### IDs + evidence + cause analysis", "passed": true, "evidence": "PP IDs: ['PP-001', 'PP-002', 'PP-003', 'PP-004', 'PP-005', 'PP-006', 'PP-007'], cause-analysis section: True"}, {"text": "Two Mermaid flowcharts (AS-IS, TO-BE)", "passed": true, "evidence": "2 mermaid blocks"}, {"text": "TO-BE \u2194 PP mapping table with out-of-scope PPs", "passed": true, "evidence": "mapping+scope-out language present"}, {"text": "Quantitative expected-effects table", "passed": true, "evidence": "expected-effects table found"}, {"text": "State: stage1 done, current_stage 2", "passed": true, "evidence": "stage1=done, current=2, outputs=['docs/01-process-analysis.md']"}], "pass_count": 6, "total": 6, "summary": {"passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0}}}, {"id": "eval-1-asis-tobe-without_skill", "prompt": "1\ub2e8\uacc4 \uc9c4\ud589\ud558\uc790. \ub3d9\ub124 \uce74\ud398 \uc0ac\uc7a5\ub2d8\uc774 \uc885\uc774 \ucfe0\ud3f0\uc73c\ub85c \ub2e8\uace8 \uad00\ub9ac\ud558\ub294 \ud604\ud589 \ud504\ub85c\uc138\uc2a4\ub97c \ubd84\uc11d\ud558\uace0 AS-IS/TO-BE \ubb38\uc11c\ub97c \ub9cc\ub4e4\uc5b4\uc918.", "eval_id": 1, "outputs": [], "grading": {"expectations": [{"text": "Doc at convention path docs/01-process-analysis.md", "passed": false, "evidence": "not found (convention path)"}, {"text": "Pain points have PP-### IDs + evidence + cause analysis", "passed": false, "evidence": "PP IDs: [], cause-analysis section: True"}, {"text": "Two Mermaid flowcharts (AS-IS, TO-BE)", "passed": false, "evidence": "0 mermaid blocks"}, {"text": "TO-BE \u2194 PP mapping table with out-of-scope PPs", "passed": false, "evidence": "no PP mapping table w/ out-of-scope"}, {"text": "Quantitative expected-effects table", "passed": true, "evidence": "expected-effects table found"}, {"text": "State: stage1 done, current_stage 2", "passed": true, "evidence": "stage1=done, current=2, outputs=['docs/01-asis-tobe.md']"}], "pass_count": 2, "total": 6, "summary": {"passed": 2, "failed": 4, "total": 6, "pass_rate": 0.3333}}}, {"id": "eval-2-sprint-plan-with_skill", "prompt": "4\ub2e8\uacc4 \uc9c4\ud589\ud558\uc790. \uc2a4\ud504\ub9b0\ud2b8 \uacc4\ud68d \uc138\uc6b0\uace0 \uac04\ud2b8\ucc28\ud2b8 \ub9cc\ub4e4\uc5b4\uc918. 2026-07-06 \uc2dc\uc791\uc73c\ub85c.", "eval_id": 2, "outputs": [{"name": "RUN_SUMMARY.md", "type": "text", "content": "# RUN_SUMMARY \u2014 pdlc-4-sprint-plan (with_skill, eval-2)\n\n- \uc2e4\ud589\uc77c: 2026-07-02 (\ube44\ub300\ud654\ud615 \uc2e4\ud589)\n- \uc2a4\ud0ac: `/Users/park/Desktop/fablev3-skills/pdlc-4-sprint-plan/SKILL.md` + `references/templates.md`\n- \ud0dc\uc2a4\ud06c: \"4\ub2e8\uacc4 \uc9c4\ud589\ud558\uc790. \uc2a4\ud504\ub9b0\ud2b8 \uacc4\ud68d \uc138\uc6b0\uace0 \uac04\ud2b8\ucc28\ud2b8 \ub9cc\ub4e4\uc5b4\uc918. 2026-07-06 \uc2dc\uc791\uc73c\ub85c.\"\n\n## \uc0b0\ucd9c\ubb3c\n\n| \ud30c\uc77c | \ub0b4\uc6a9 |\n|---|---|\n| `docs/04-plan/milestones.md` | \ud655\uc815 \uc0ac\ud56d(\ud575\uc2ec 3\uac1c+\ud0c8\ub77d \uc0ac\uc720), \ub9c8\uc77c\uc2a4\ud1a4 5\uac1c(exit criteria), WBS 17\uac1c \uc791\uc5c5(\uc5ed\ud560\u00b7\uc18c\uc694\u00b7\uc758\uc874), \uc77c\uc815 \ub9ac\uc2a4\ud06c 3\uac1c |\n| `docs/04-plan/gantt.md` | Mermaid \uac04\ud2b8 \u2014 section=\ub9c8\uc77c\uc2a4\ud1a4, `after` \uc758\uc874, `crit` \ub9c8\ud0b9, `excludes weekends`, \ubc84\ud37c 3\uac1c \uba85\uc2dc \uc791\uc5c5 |\n| `docs/04-plan/gantt.html` | \ud15c\ud50c\ub9bf \uace8\uaca9 \uae30\ubc18 \uc778\ud130\ub799\ud2f0\ube0c \uac04\ud2b8 (CDN \uc5c6\uc74c) \u2014 TASKS 17\uac1c / MILESTONES 5\uac1c / \uc624\ub298\uc120 / \ud638\ubc84 \uc0c1\uc138 |\n| `docs/pipeline-state.json` | 4\ub2e8\uacc4 `done`(outputs 3\uac1c), `current_stage: 5`, decisions 2\uac74 \ucd94\uac00, risks 3\uac74 \ucd94\uac00 |\n| (setup) `docs/00-project-brief.md`, `docs/03-spec/functional-spec.md` | fixture\uc5d0\uc11c \ubcf5\uc0ac |\n\n## \ube44\ub300\ud654\ud615 \ub300\uccb4 \uacb0\uc815 (\uc2a4\ud0ac\uc774 \uc0ac\uc6a9\uc790 \ud655\uc778\uc744 \uc694\uad6c\ud55c \uc9c0\uc810)\n\n1. **\ud575\uc2ec \uae30\ub2a5 3\uac1c \ud655\uc815** (\uc6cc\ud06c\ud50c\ub85c\uc6b0 1\ub2e8\uacc4, \uc6d0\ub798 \uc0ac\uc6a9\uc790\uc640 \ud655\uc815): \u2605 \ud6c4\ubcf4 4\uac1c \uc911 **FEAT-001\u00b7002\u00b7003** \uc120\uc815, FEAT-004 \ud0c8\ub77d.\n   \uadfc\uac70 \u2014 Must REQ-001~003 \ucee4\ubc84, brief\uc758 \uc131\uacf5 \uae30\uc900 \"\ubc1c\ud589\u2192\uc801\ub9bd\u2192\uc0ac\uc6a9 \uc5ec\uc815 5\ubd84 \ub0b4 \uc644\uc8fc\"\ub97c 3\uac1c\uac00 \ud558\ub098\uc758 \uc5f0\uacb0 \uc5ec\uc815\uc73c\ub85c \uc644\uc131, \ub09c\uc774\ub3c4 \uade0\ud615. FEAT-004\ub294 \uc5ec\uc815 \uc644\uc8fc\uc5d0 \ube44\ud544\uc218\uc774\uba70 \uc801\ub9bd \uc644\ub8cc \ud654\uba74 \ud604\ud669 \ud45c\uc2dc\ub85c \ubd80\ubd84 \ub300\uccb4. \uc778\uc99d\uc740 \uc2a4\ud0ac \uc9c0\uce68\ub300\ub85c 3\uac1c\uc5d0 \ubbf8\ud3ec\ud568, \uae30\ubc18 \uc791\uc5c5\uc73c\ub85c \uc77c\uc815 \ubc18\uc601. \u2192 `decisions`\uc5d0 \uae30\ub85d \uc644\ub8cc.\n2. **\uc0ac\uc6a9\uc790 \ub9ac\ubdf0 \ubc18\uc601(\uae30\uac04 \ud604\uc2e4\uc131)** (\uc6cc\ud06c\ud50c\ub85c\uc6b0 6\ub2e8\uacc4): \ub9ac\ubdf0 \ubd88\uac00\ud558\ubbc0\ub85c brief \uc81c\uc57d(6\uc8fc, 1\uc778, 2026-07-06 \uc2dc\uc791)\uc744 \uadf8\ub300\ub85c \ucc44\ud0dd\ud558\uace0 1\uc778 \uc9c1\ub82c \uc9c4\ud589\u00b7\uc8fc\ub9d0 \uc81c\uc678\u00b7\ubc84\ud37c 16.7%\ub85c \ud604\uc2e4\uc131\uc744 \uc790\uccb4 \uac80\uc99d. \uac80\uc99d \uc2a4\ud06c\ub9bd\ud2b8\ub85c \uc8fc\ub9d0 \uce68\ubc94 0\uac74, \uadfc\ubb34\uc77c 30\uc77c \uc815\ud655\ud788 \uc18c\uc9c4 \ud655\uc778.\n\n## \uc77c\uc815 \ub370\uc774\ud130 \uc694\uc57d (3\uac1c \ud30c\uc77c \ub3d9\uc77c \ub370\uc774\ud130)\n\n- \uae30\uac04: 2026-07-06(\uc6d4) ~ 2026-08-14(\uae08), \uc8fc\ub9d0 \uc81c\uc678 \uadfc\ubb34\uc77c 30\uc77c = \uc791\uc5c5 25d + \ubc84\ud37c 5d (16.7%, \uc2a4\ud0ac \uc694\uad6c 15~20% \ucda9\uc871)\n- \ub9c8\uc77c\uc2a4\ud1a4: MS-1 \uacc4\ud68d \ud655\uc815 07-06 / MS-2 MVP \uad6c\ud604 07-31 / MS-3 QA \uc644\ub8cc 08-07 / MS-4 \uc6b4\uc601 \uc900\ube44 08-11 / MS-5 \ud3ec\ud2b8\ud3f4\ub9ac\uc624 \uacf5\uac1c 08-14\n- \ud06c\ub9ac\ud2f0\uceec \ud328\uc2a4: \uacc4\ud68d\u2192\uc14b\uc5c5\u2192DB\u2192\uc778\uc99d\u2192FEAT-001\u2192002\u2192003\u2192E2E\u2192TC\uc791\uc131\u2192TC\uc2e4\ud589\u2192\ubc84\uadf8\uc218\uc815\n- \ud30c\uc774\ud504\ub77c\uc778 \uc794\uc5ec \ub2e8\uacc4(5 \uad6c\ud604, 6 QA, 7 \uc6b4\uc601, 8 \ud3ec\ud2b8\ud3f4\ub9ac\uc624)\ub97c \uc2a4\ud0ac \uc9c0\uce68\ub300\ub85c \uc2e4\uc81c \uc77c\uc815\uc5d0 \ud3ec\ud568\n\n## \ub530\ub974\uc9c0 \ubabb\ud588\uac70\ub098 \ud574\uc11d\uc774 \ud544\uc694\ud588\ub358 \uc2a4\ud0ac \uc9c0\uce68\n\n1. **\uc0ac\uc6a9\uc790 \ud655\uc778 2\ud68c\ub97c \uc790\uccb4 \uacb0\uc815\uc73c\ub85c \ub300\uccb4** \u2014 \uc704 \"\ube44\ub300\ud654\ud615 \ub300\uccb4 \uacb0\uc815\" \ucc38\uc870. \uc2a4\ud0ac\uc774 \uc694\uad6c\ud55c \ub300\ub85c \uacb0\uc815\u00b7\uc0ac\uc720\ub97c `decisions`\uc5d0 \uae30\ub85d\ud558\ub294 \uac83\uc73c\ub85c \uac08\uc74c.\n2. **pipeline-state \uc2dc\uc791 \uc2dc 4\ub2e8\uacc4 `in_progress`** \u2014 fixture\ub294 `pending` \uc0c1\ud0dc\uc600\uc74c. \ub2e8\uc77c \uc2e4\ud589 \ub0b4\uc5d0\uc11c in_progress \uc911\uac04 \uc800\uc7a5 \uc5c6\uc774 \uace7\ubc14\ub85c \ucd5c\uc885 \uc0c1\ud0dc(`done`)\ub85c \uac31\uc2e0\ud568 (\uc911\uac04 \uc0c1\ud0dc \ud30c\uc77c\uc740 \uc0b0\ucd9c\ubb3c\ub85c \ub0a8\uc9c0 \uc54a\uc74c).\n3. **\ub0a0\uc9dc \uc815\ud569\uc131** \u2014 fixture \ud0c0\uc784\ub77c\uc778(1~3\ub2e8\uacc4 completed_at\uc774 2026-07-02~04)\uc774 \uc2e4\uc81c \uc624\ub298(07-02)\ubcf4\ub2e4 \uc55e\uc11c \uc788\uc5b4, 4\ub2e8\uacc4 completed_at/decision \ub0a0\uc9dc\ub97c fixture \ub0b4\ubd80 \ud0c0\uc784\ub77c\uc778\uc5d0 \ub9de\ucdb0 **2026-07-05**\ub85c \uae30\ub85d\ud568(\uc2e4\ud589\uc77c 07-02\uac00 \uc544\ub2d8). \uc11c\uc0ac\uc801 \uc77c\uad00\uc131\uc744 \uc6b0\uc120\ud55c \ud574\uc11d.\n4. **RISK ID \ubc88\ud638** \u2014 pipeline-state\uc758 risks\uac00 \ube44\uc5b4 \uc788\uc73c\ub098 \ud15c\ud50c\ub9bf \uc608\uc2dc\uac00 RISK-002\ubd80\ud130 \uc2dc\uc791\ud558\ubbc0\ub85c RISK-002~004\ub85c \ubd80\uc5ec (RISK-001\uc740 \uc774\uc804 \ub2e8\uacc4 \uc608\uc57d\uc73c\ub85c \ud574\uc11d).\n5. **\ub2e4\uc74c \ub2e8\uacc4 \uc81c\uc548** \u2014 \uc2a4\ud0ac \ub9c8\ubb34\ub9ac \uc9c0\uce68 \"pdlc-5-build \uc81c\uc548\"\uc740 \ub300\ud654\ud615 \ud589\uc704\ub77c \ubcf8 \ubb38\uc11c\uc640 \uc2e4\ud589 \ubcf4\uace0\uc5d0 \ubb38\uad6c\ub85c\ub9cc \ub0a8\uae40: \ub2e4\uc74c\uc740 5\ub2e8\uacc4(\uad6c\ud604), `pdlc-5-build` \uc2a4\ud0ac\ub85c FEAT-001\ubd80\ud130 \ucc29\uc218.\n\n## \uc790\uccb4 \uc810\uac80 (SKILL.md self-check)\n\n- [x] \ud575\uc2ec \uae30\ub2a5 3\uac1c \ud655\uc815 + \ud0c8\ub77d \uc0ac\uc720 \uae30\ub85d (milestones.md \u00a71, pipeline-state decisions)\n- [x] \ubaa8\ub4e0 \uc791\uc5c5\uc5d0 \ub2f4\ub2f9 \uc5ed\ud560\u00b7\uc18c\uc694\u00b7\uc758\uc874\uad00\uacc4 (WBS 17\uac74 \uc804\ubd80)\n- [x] \ub9c8\uc77c\uc2a4\ud1a4\ub9c8\ub2e4 \uac80\uc99d \uac00\ub2a5\ud55c exit criteria (\ubaa8\ud638\ud55c \"\uac1c\ubc1c \uc644\ub8cc\"\ub958 \uc5c6\uc74c)\n- [x] Mermaid \uac04\ud2b8(crit \ub9c8\ud0b9) + HTML \uac04\ud2b8, \ub370\uc774\ud130 \uc77c\uce58 (node \uc2a4\ud06c\ub9bd\ud2b8\ub85c \uadfc\ubb34\uc77c 30\uc77c\u00b7\uc8fc\ub9d0 \uce68\ubc94 0\uac74 \uac80\uc99d)\n- [x] \ubc84\ud37c 16.7% \uba85\uc2dc(\uc791\uc5c5\uc73c\ub85c \ud45c\uae30), \uc77c\uc815 \ub9ac\uc2a4\ud06c 3\uac74(RISK-002~004) \uae30\ub85d\n"}], "grading": {"expectations": [{"text": "Core 3 features finalized with elimination rationale", "passed": true, "evidence": "picked123=True, elimination-rationale=True, explicit-3=True"}, {"text": "Milestones have verifiable exit criteria", "passed": true, "evidence": "verifiable exit criteria found"}, {"text": "Mermaid gantt with deps + crit marking", "passed": true, "evidence": "gantt+after=True, crit=True"}, {"text": "Self-contained gantt HTML (no CDN)", "passed": true, "evidence": "docs/04-plan/gantt.html; external CDN: False"}, {"text": "Explicit 15-20% buffer", "passed": true, "evidence": "explicit buffer % found"}, {"text": "State: stage4 done, current_stage 5, decision recorded", "passed": true, "evidence": "stage4=done, current=5, decisions=3"}], "pass_count": 6, "total": 6, "summary": {"passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0}}}, {"id": "eval-2-sprint-plan-without_skill", "prompt": "4\ub2e8\uacc4 \uc9c4\ud589\ud558\uc790. \uc2a4\ud504\ub9b0\ud2b8 \uacc4\ud68d \uc138\uc6b0\uace0 \uac04\ud2b8\ucc28\ud2b8 \ub9cc\ub4e4\uc5b4\uc918. 2026-07-06 \uc2dc\uc791\uc73c\ub85c.", "eval_id": 2, "outputs": [], "grading": {"expectations": [{"text": "Core 3 features finalized with elimination rationale", "passed": false, "evidence": "picked123=True, elimination-rationale=True, explicit-3=False"}, {"text": "Milestones have verifiable exit criteria", "passed": false, "evidence": "not found"}, {"text": "Mermaid gantt with deps + crit marking", "passed": false, "evidence": "gantt+after=True, crit=False"}, {"text": "Self-contained gantt HTML (no CDN)", "passed": true, "evidence": "docs/04-sprint-plan/gantt-chart.html; external CDN: False"}, {"text": "Explicit 15-20% buffer", "passed": true, "evidence": "explicit buffer % found"}, {"text": "State: stage4 done, current_stage 5, decision recorded", "passed": true, "evidence": "stage4=done, current=5, decisions=1"}], "pass_count": 3, "total": 6, "summary": {"passed": 3, "failed": 3, "total": 6, "pass_rate": 0.5}}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "pdlc-pipeline-suite", "skill_path": "<path/to/skill>", "executor_model": "<model-name>", "analyzer_model": "<model-name>", "timestamp": "2026-07-02T08:10:57Z", "evals_run": [0, 1, 2], "runs_per_configuration": 3}, "runs": [{"eval_id": 0, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4, "time_seconds": 137.6, "tokens": 49842, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Project brief at docs/00-project-brief.md with \ud55c \uc904 \uc815\uc758/Out of Scope/\uc81c\uc57d/\uc131\uacf5 \uae30\uc900", "passed": true, "evidence": "file docs/00-project-brief.md; missing sections: none"}, {"text": "pipeline-state.json matches 8-stage schema", "passed": true, "evidence": "keys: ['current_stage', 'decisions', 'project', 'risks', 'stages', 'version']; stages: ['1', '2', '3', '4', '5', '6', '7', '8']"}, {"text": "Assumptions explicitly recorded", "passed": true, "evidence": "15 mentions of \uac00\uc815/assumption"}, {"text": "Guides user to stage 1 (AS-IS/TO-BE) next", "passed": true, "evidence": "mentions 1\ub2e8\uacc4/AS-IS next"}], "notes": []}, {"eval_id": 1, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6, "time_seconds": 232.4, "tokens": 54604, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Doc at convention path docs/01-process-analysis.md", "passed": true, "evidence": "docs/01-process-analysis.md"}, {"text": "Pain points have PP-### IDs + evidence + cause analysis", "passed": true, "evidence": "PP IDs: ['PP-001', 'PP-002', 'PP-003', 'PP-004', 'PP-005', 'PP-006', 'PP-007'], cause-analysis section: True"}, {"text": "Two Mermaid flowcharts (AS-IS, TO-BE)", "passed": true, "evidence": "2 mermaid blocks"}, {"text": "TO-BE \u2194 PP mapping table with out-of-scope PPs", "passed": true, "evidence": "mapping+scope-out language present"}, {"text": "Quantitative expected-effects table", "passed": true, "evidence": "expected-effects table found"}, {"text": "State: stage1 done, current_stage 2", "passed": true, "evidence": "stage1=done, current=2, outputs=['docs/01-process-analysis.md']"}], "notes": []}, {"eval_id": 2, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6, "time_seconds": 342.5, "tokens": 68233, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Core 3 features finalized with elimination rationale", "passed": true, "evidence": "picked123=True, elimination-rationale=True, explicit-3=True"}, {"text": "Milestones have verifiable exit criteria", "passed": true, "evidence": "verifiable exit criteria found"}, {"text": "Mermaid gantt with deps + crit marking", "passed": true, "evidence": "gantt+after=True, crit=True"}, {"text": "Self-contained gantt HTML (no CDN)", "passed": true, "evidence": "docs/04-plan/gantt.html; external CDN: False"}, {"text": "Explicit 15-20% buffer", "passed": true, "evidence": "explicit buffer % found"}, {"text": "State: stage4 done, current_stage 5, decision recorded", "passed": true, "evidence": "stage4=done, current=5, decisions=3"}], "notes": []}, {"eval_id": 0, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.0, "passed": 0, "failed": 4, "total": 4, "time_seconds": 314.7, "tokens": 55168, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Project brief at docs/00-project-brief.md with \ud55c \uc904 \uc815\uc758/Out of Scope/\uc81c\uc57d/\uc131\uacf5 \uae30\uc900", "passed": false, "evidence": "no docs/00-project-brief.md"}, {"text": "pipeline-state.json matches 8-stage schema", "passed": false, "evidence": "no pipeline-state.json"}, {"text": "Assumptions explicitly recorded", "passed": false, "evidence": "0 mentions of \uac00\uc815/assumption"}, {"text": "Guides user to stage 1 (AS-IS/TO-BE) next", "passed": false, "evidence": "no stage-1 guidance found"}], "notes": []}, {"eval_id": 1, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.3333, "passed": 2, "failed": 4, "total": 6, "time_seconds": 180.1, "tokens": 46589, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Doc at convention path docs/01-process-analysis.md", "passed": false, "evidence": "not found (convention path)"}, {"text": "Pain points have PP-### IDs + evidence + cause analysis", "passed": false, "evidence": "PP IDs: [], cause-analysis section: True"}, {"text": "Two Mermaid flowcharts (AS-IS, TO-BE)", "passed": false, "evidence": "0 mermaid blocks"}, {"text": "TO-BE \u2194 PP mapping table with out-of-scope PPs", "passed": false, "evidence": "no PP mapping table w/ out-of-scope"}, {"text": "Quantitative expected-effects table", "passed": true, "evidence": "expected-effects table found"}, {"text": "State: stage1 done, current_stage 2", "passed": true, "evidence": "stage1=done, current=2, outputs=['docs/01-asis-tobe.md']"}], "notes": []}, {"eval_id": 2, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.5, "passed": 3, "failed": 3, "total": 6, "time_seconds": 203.6, "tokens": 51332, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Core 3 features finalized with elimination rationale", "passed": false, "evidence": "picked123=True, elimination-rationale=True, explicit-3=False"}, {"text": "Milestones have verifiable exit criteria", "passed": false, "evidence": "not found"}, {"text": "Mermaid gantt with deps + crit marking", "passed": false, "evidence": "gantt+after=True, crit=False"}, {"text": "Self-contained gantt HTML (no CDN)", "passed": true, "evidence": "docs/04-sprint-plan/gantt-chart.html; external CDN: False"}, {"text": "Explicit 15-20% buffer", "passed": true, "evidence": "explicit buffer % found"}, {"text": "State: stage4 done, current_stage 5, decision recorded", "passed": true, "evidence": "stage4=done, current=5, decisions=1"}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 237.5, "stddev": 102.5452, "min": 137.6, "max": 342.5}, "tokens": {"mean": 57559.6667, "stddev": 9545.1136, "min": 49842, "max": 68233}}, "without_skill": {"pass_rate": {"mean": 0.2778, "stddev": 0.2546, "min": 0.0, "max": 0.5}, "time_seconds": {"mean": 232.8, "stddev": 71.8942, "min": 180.1, "max": 314.7}, "tokens": {"mean": 51029.6667, "stddev": 4297.4835, "min": 46589, "max": 55168}}, "delta": {"pass_rate": "+0.72", "time_seconds": "+4.7", "tokens": "+6530"}}, "notes": ["\uc2a4\ud0ac \uc0ac\uc6a9 \uc2dc 3\uac1c \ucf00\uc774\uc2a4 \ubaa8\ub450 100% (16/16). \ubbf8\uc0ac\uc6a9 \uc2dc 27.8% \u2014 \uaca9\ucc28\ub294 \uc8fc\ub85c \uaddc\uc57d(\ud30c\uc77c \uacbd\ub85c, ID \uccb4\uacc4, \uc0c1\ud0dc \uc2a4\ud0a4\ub9c8) \uc900\uc218\uc5d0\uc11c \ubc1c\uc0dd. \ubbf8\uc0ac\uc6a9 \uc0b0\ucd9c\ubb3c\ub3c4 \ubb38\uc11c \ud488\uc9c8 \uc790\uccb4\ub294 \uc900\uc218\ud558\ub098 \ud30c\uc774\ud504\ub77c\uc778\uc73c\ub85c \uc5f0\uacb0\uc774 \uc548 \ub418\ub294 \ud615\ud0dc.", "\uc8fc\uc758: \uc5b4\uc11c\uc158 \uc0c1\ub2f9\uc218\uac00 \uc2a4\ud0ac\uc774 \uc815\uc758\ud55c \uaddc\uc57d \uc790\uccb4\ub97c \uac80\uc0ac\ud558\ubbc0\ub85c baseline\uc5d0 \uad6c\uc870\uc801\uc73c\ub85c \ubd88\ub9ac\ud568. \ub2e4\ub9cc '\uac80\uc99d \uac00\ub2a5\ud55c exit criteria', 'crit \ub9c8\ud0b9', '\ud0c8\ub77d \uc0ac\uc720 \uae30\ub85d' \uac19\uc740 \ud488\uc9c8 \uc5b4\uc11c\uc158\uc5d0\uc11c\ub3c4 baseline\uc774 \uc2e4\ud328\ud55c \uc810\uc740 \uc720\uc758\ubbf8.", "\ube44\uc6a9: \uc2a4\ud0ac \uc0ac\uc6a9 \uc2dc \ud1a0\ud070 +13% (\uaddc\uc57d/\ud15c\ud50c\ub9bf \ub85c\ub4dc \ube44\uc6a9). \uc2dc\uac04 \ucc28\uc774\ub294 \ub178\uc774\uc988 \uc218\uc900.", "\ubc1c\uacac \uc774\uc288: eval-1 with_skill\uc774 '\uc0ac\uc6a9\uc790 \ub9ac\ubdf0 \uc804 \uc644\ub8cc \ucc98\ub9ac \uae08\uc9c0'\ub97c \uc9c0\ud0ac \uc218 \uc5c6\uc5b4 \ubb38\uc11c\ub97c Draft\ub85c \ub450\uba74\uc11c \uc0c1\ud0dc\ub294 done\uc73c\ub85c \uc62c\ub9bc \u2014 \ube44\ub300\ud654\ud615 \uc2e4\ud589\uc5d0\uc11c\uc758 \uc808\ucda9\uc774\uba70 \uc2e4\uc0ac\uc6a9(\ub300\ud654\ud615)\uc5d0\uc11c\ub294 \ubb38\uc81c \uc5c6\uc74c."]}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

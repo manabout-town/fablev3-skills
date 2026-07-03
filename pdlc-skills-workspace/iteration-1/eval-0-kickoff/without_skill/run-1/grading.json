@@ -1,0 +1,32 @@
+{
+  "expectations": [
+    {
+      "text": "Project brief at docs/00-project-brief.md with 한 줄 정의/Out of Scope/제약/성공 기준",
+      "passed": false,
+      "evidence": "no docs/00-project-brief.md"
+    },
+    {
+      "text": "pipeline-state.json matches 8-stage schema",
+      "passed": false,
+      "evidence": "no pipeline-state.json"
+    },
+    {
+      "text": "Assumptions explicitly recorded",
+      "passed": false,
+      "evidence": "0 mentions of 가정/assumption"
+    },
+    {
+      "text": "Guides user to stage 1 (AS-IS/TO-BE) next",
+      "passed": false,
+      "evidence": "no stage-1 guidance found"
+    }
+  ],
+  "pass_count": 0,
+  "total": 4,
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "total": 4,
+    "pass_rate": 0.0
+  }
+}

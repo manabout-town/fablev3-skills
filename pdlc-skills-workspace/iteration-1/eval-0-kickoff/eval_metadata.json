@@ -1,0 +1,11 @@
+{
+  "eval_id": 0,
+  "eval_name": "orchestrator-kickoff",
+  "prompt": "러닝 크루 매칭 앱 프로젝트를 시작하려고 해. 킥오프하고 파이프라인 세팅해줘. 6주짜리 1인 사이드 프로젝트고, 목표는 포트폴리오까지 완성하는 거야.",
+  "assertions": [
+    "Project brief exists at docs/00-project-brief.md with 한 줄 정의, Out of Scope, 제약 조건, 성공 기준 sections",
+    "docs/pipeline-state.json exists and matches the 8-stage schema (stages 1-8, current_stage, decisions, risks)",
+    "Assumptions made in lieu of the user interview are explicitly recorded",
+    "Output guides the user to stage 1 (AS-IS/TO-BE) as the next step"
+  ]
+}

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>단골도장 간트차트</title>
+<style>
+  :root { --bar:#4f7cf7; --crit:#e5534b; --done:#57ab5a; --line:#e2e5ea; }
+  body { font-family:'Pretendard','Apple SD Gothic Neo',sans-serif; margin:24px; color:#1f2328; }
+  h1 { font-size:20px; } .legend { font-size:12px; color:#57606a; margin-bottom:12px; }
+  .chip { display:inline-block; width:10px; height:10px; border-radius:2px; margin:0 4px 0 12px; }
+  #gantt { position:relative; border:1px solid var(--line); overflow-x:auto; }
+  .row { display:flex; height:32px; border-bottom:1px solid var(--line); align-items:center; }
+  .label { position:sticky; left:0; background:#fff; width:220px; min-width:220px; font-size:12px;
+           padding:0 8px; border-right:1px solid var(--line); z-index:2;
+           white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .track { position:relative; height:100%; flex:1; }
+  .bar { position:absolute; top:7px; height:18px; border-radius:4px; background:var(--bar); cursor:pointer; }
+  .bar.crit { background:var(--crit); } .bar.done { background:var(--done); }
+  .ms { position:absolute; top:9px; width:14px; height:14px; background:#8250df; transform:rotate(45deg); }
+  .grid { position:absolute; top:0; bottom:0; border-left:1px dashed var(--line); font-size:10px; color:#8b949e; padding-left:2px; }
+  .today { border-left:2px solid #d29922; z-index:1; }
+  #tip { position:fixed; display:none; background:#1f2328; color:#fff; font-size:12px;
+         padding:8px 10px; border-radius:6px; z-index:9; max-width:280px; pointer-events:none; }
+  .section-row { background:#f6f8fa; font-weight:600; }
+</style>
+</head>
+<body>
+<h1 id="title"></h1>
+<div class="legend">
+  <span class="chip" style="background:var(--bar)"></span>일반
+  <span class="chip" style="background:var(--crit)"></span>크리티컬 패스
+  <span class="chip" style="background:var(--done)"></span>완료
+  <span class="chip" style="background:#8250df"></span>마일스톤
+  <span class="chip" style="background:#d29922"></span>오늘
+</div>
+<div id="gantt"></div>
+<div id="tip"></div>
+<script>
+const PROJECT = { title: "단골도장 개발 일정 (2026-07-06 ~ 2026-08-14)", start: "2026-07-06", end: "2026-08-14" };
+// section: 마일스톤 그룹, crit: 크리티컬, done: 완료, dep: 의존 작업명 (날짜는 시작·종료 모두 포함)
+const TASKS = [
+  { section:"MS-1 계획 확정", name:"스프린트 계획 확정",              start:"2026-07-06", end:"2026-07-06", crit:true,  done:false, owner:"기획", dep:"-" },
+  { section:"MS-2 MVP 구현", name:"프로젝트 셋업(Next.js+Supabase)", start:"2026-07-07", end:"2026-07-07", crit:true,  done:false, owner:"개발", dep:"스프린트 계획 확정" },
+  { section:"MS-2 MVP 구현", name:"DB 스키마 설계·마이그레이션",     start:"2026-07-08", end:"2026-07-08", crit:true,  done:false, owner:"개발", dep:"프로젝트 셋업" },
+  { section:"MS-2 MVP 구현", name:"인증 기반 작업(로그인·RLS)",      start:"2026-07-09", end:"2026-07-10", crit:true,  done:false, owner:"개발", dep:"DB 스키마 설계·마이그레이션" },
+  { section:"MS-2 MVP 구현", name:"FEAT-001 매장 등록·설정",         start:"2026-07-13", end:"2026-07-14", crit:true,  done:false, owner:"개발", dep:"인증 기반 작업" },
+  { section:"MS-2 MVP 구현", name:"FEAT-002 QR 도장 적립",           start:"2026-07-15", end:"2026-07-17", crit:true,  done:false, owner:"개발", dep:"FEAT-001" },
+  { section:"MS-2 MVP 구현", name:"FEAT-003 쿠폰 발행·사용 처리",    start:"2026-07-20", end:"2026-07-22", crit:true,  done:false, owner:"개발", dep:"FEAT-002" },
+  { section:"MS-2 MVP 구현", name:"여정 통합·E2E 점검",              start:"2026-07-23", end:"2026-07-24", crit:true,  done:false, owner:"개발", dep:"FEAT-003" },
+  { section:"MS-2 MVP 구현", name:"오류 처리·UI 정리(POL-001~005)",  start:"2026-07-27", end:"2026-07-28", crit:false, done:false, owner:"개발", dep:"여정 통합·E2E 점검" },
+  { section:"MS-2 MVP 구현", name:"구현 버퍼",                       start:"2026-07-29", end:"2026-07-31", crit:false, done:false, owner:"개발", dep:"오류 처리·UI 정리" },
+  { section:"MS-3 QA",       name:"테스트 시나리오·TC 작성",         start:"2026-08-03", end:"2026-08-03", crit:true,  done:false, owner:"QA",   dep:"구현 버퍼" },
+  { section:"MS-3 QA",       name:"TC 실행 1차",                     start:"2026-08-04", end:"2026-08-05", crit:true,  done:false, owner:"QA",   dep:"테스트 시나리오·TC 작성" },
+  { section:"MS-3 QA",       name:"버그 수정·회귀 테스트",           start:"2026-08-06", end:"2026-08-06", crit:true,  done:false, owner:"개발", dep:"TC 실행 1차" },
+  { section:"MS-3 QA",       name:"QA 버퍼",                         start:"2026-08-07", end:"2026-08-07", crit:false, done:false, owner:"QA",   dep:"버그 수정·회귀 테스트" },
+  { section:"MS-4 운영 준비", name:"운영 시나리오·재배포 계획",      start:"2026-08-10", end:"2026-08-11", crit:false, done:false, owner:"기획", dep:"QA 버퍼" },
+  { section:"MS-5 포트폴리오", name:"포트폴리오 작성·발행",          start:"2026-08-12", end:"2026-08-13", crit:false, done:false, owner:"기획", dep:"운영 시나리오·재배포 계획" },
+  { section:"MS-5 포트폴리오", name:"최종 버퍼",                     start:"2026-08-14", end:"2026-08-14", crit:false, done:false, owner:"기획", dep:"포트폴리오 작성·발행" },
+];
+const MILESTONES = [
+  { name:"MS-1 계획 확정",      date:"2026-07-06" },
+  { name:"MS-2 MVP 시연 가능",  date:"2026-07-31" },
+  { name:"MS-3 QA 완료",        date:"2026-08-07" },
+  { name:"MS-4 운영 준비 완료", date:"2026-08-11" },
+  { name:"MS-5 포트폴리오 공개", date:"2026-08-14" },
+];
+
+const day = 86400000, p0 = new Date(PROJECT.start), p1 = new Date(PROJECT.end);
+const total = Math.round((p1 - p0) / day) + 1, pxPerDay = Math.max(18, Math.floor(1000/total));
+const x = d => (Math.round((new Date(d) - p0) / day)) * pxPerDay;
+const g = document.getElementById('gantt'), tip = document.getElementById('tip');
+document.getElementById('title').textContent = PROJECT.title;
+
+function addRow(labelText, cls) {
+  const row = document.createElement('div'); row.className = 'row' + (cls ? ' ' + cls : '');
+  const label = document.createElement('div'); label.className = 'label'; label.textContent = labelText;
+  const track = document.createElement('div'); track.className = 'track'; track.style.width = total*pxPerDay + 'px';
+  row.append(label, track); g.append(row); return track;
+}
+function decorate(track, withDates) {
+  for (let i = 0; i <= total; i += 7) {
+    const gr = document.createElement('div'); gr.className = 'grid'; gr.style.left = i*pxPerDay + 'px';
+    if (withDates) gr.textContent = new Date(p0.getTime() + i*day).toISOString().slice(5,10);
+    track.append(gr);
+  }
+  const t = Math.round((new Date().setHours(0,0,0,0) - p0) / day);
+  if (t >= 0 && t <= total) {
+    const td = document.createElement('div'); td.className = 'grid today'; td.style.left = t*pxPerDay + 'px'; track.append(td);
+  }
+}
+decorate(addRow('', ''), true);
+let cur = null;
+for (const t of TASKS) {
+  if (t.section !== cur) { cur = t.section; decorate(addRow(cur, 'section-row'), false); }
+  const track = addRow('  ' + t.name, ''); decorate(track, false);
+  const bar = document.createElement('div');
+  bar.className = 'bar' + (t.crit ? ' crit' : '') + (t.done ? ' done' : '');
+  bar.style.left = x(t.start) + 'px';
+  bar.style.width = Math.max(pxPerDay, x(t.end) - x(t.start) + pxPerDay) + 'px';
+  bar.onmousemove = e => { tip.style.display='block'; tip.style.left=(e.clientX+12)+'px'; tip.style.top=(e.clientY+12)+'px';
+    tip.innerHTML = `<b>${t.name}</b><br>${t.start} ~ ${t.end}<br>담당: ${t.owner} / 의존: ${t.dep}`; };
+  bar.onmouseleave = () => tip.style.display = 'none';
+  track.append(bar);
+}
+const msTrack = addRow('마일스톤', 'section-row'); decorate(msTrack, false);
+for (const m of MILESTONES) {
+  const d = document.createElement('div'); d.className = 'ms'; d.style.left = x(m.date) + 'px'; d.title = `${m.name} (${m.date})`;
+  msTrack.append(d);
+}
+</script>
+</body>
+</html>

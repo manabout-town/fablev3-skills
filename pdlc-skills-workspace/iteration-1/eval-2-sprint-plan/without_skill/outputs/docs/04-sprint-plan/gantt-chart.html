@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>단골도장 간트차트 (2026-07-06 ~ 2026-08-14)</title>
+<style>
+  :root {
+    --s1: #4f7cff; --s2: #12a594; --s3: #b0648e;
+    --buffer: #c8cdd8; --stretch-border: #12a594;
+    --grid: #e6e8ee; --text: #1f2430; --sub: #6b7280;
+    --bg: #fafbfd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", -apple-system, sans-serif;
+    color: var(--text); background: var(--bg); padding: 32px 24px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .sub { color: var(--sub); font-size: 13px; margin-bottom: 24px; }
+  .chart { background: #fff; border: 1px solid var(--grid); border-radius: 10px; padding: 16px 16px 20px; }
+
+  .row { display: flex; align-items: center; height: 30px; }
+  .row .label {
+    flex: 0 0 240px; font-size: 12.5px; padding-right: 12px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right;
+  }
+  .row .track { flex: 1; position: relative; height: 100%; border-left: 1px solid var(--grid); }
+
+  /* week grid lines: 6 weeks over 30 working days */
+  .track::before {
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(to right,
+      transparent 0, transparent calc(100%/6 - 1px),
+      var(--grid) calc(100%/6 - 1px), var(--grid) calc(100%/6));
+    pointer-events: none;
+  }
+
+  .head .label { font-weight: 700; font-size: 12px; color: var(--sub); }
+  .head .track { display: flex; border-left: 1px solid var(--grid); }
+  .head .week {
+    flex: 1; text-align: center; font-size: 11.5px; color: var(--sub);
+    border-right: 1px solid var(--grid); padding: 4px 0; line-height: 1.35;
+  }
+  .head .week b { display: block; color: var(--text); font-size: 12px; }
+
+  .group { margin-top: 14px; }
+  .group-title {
+    font-size: 13px; font-weight: 700; padding: 6px 0 6px 0; margin-left: 0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  .bar {
+    position: absolute; top: 5px; height: 20px; border-radius: 5px;
+    font-size: 11px; color: #fff; line-height: 20px; padding: 0 6px;
+    white-space: nowrap; overflow: visible;
+  }
+  .bar.s1 { background: var(--s1); }
+  .bar.s2 { background: var(--s2); }
+  .bar.s3 { background: var(--s3); }
+  .bar.buffer { background: var(--buffer); color: #4b5563; }
+  .bar.stretch { background: #fff; border: 2px dashed var(--stretch-border); color: var(--stretch-border); line-height: 16px; }
+
+  .ms {
+    position: absolute; top: 8px; width: 14px; height: 14px;
+    background: #f5a623; transform: translateX(-7px) rotate(45deg);
+    border: 2px solid #d78b0c; border-radius: 2px;
+  }
+  .ms-label {
+    position: absolute; top: 7px; font-size: 11px; font-weight: 700; color: #b06e00;
+    transform: translateX(-100%); padding-right: 12px; white-space: nowrap; line-height: 16px;
+  }
+  .ms-label.right { transform: none; padding-right: 0; padding-left: 12px; }
+
+  .legend { display: flex; gap: 18px; margin-top: 18px; font-size: 12px; color: var(--sub); flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .legend .ms-i { width: 10px; height: 10px; background: #f5a623; border: 2px solid #d78b0c; transform: rotate(45deg); border-radius: 2px; }
+  .legend .st-i { width: 22px; height: 12px; border: 2px dashed var(--stretch-border); border-radius: 4px; }
+  .note { margin-top: 10px; font-size: 11.5px; color: var(--sub); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>단골도장 · 6주 스프린트 간트차트</h1>
+  <div class="sub">2026-07-06(월) ~ 2026-08-14(금) · 1인 팀 · 주말 제외 30 작업일 기준</div>
+
+  <div class="chart">
+    <div class="row head">
+      <div class="label">작업</div>
+      <div class="track" style="border-left:none;">
+        <div class="week"><b>W1</b>07-06~10</div>
+        <div class="week"><b>W2</b>07-13~17</div>
+        <div class="week"><b>W3</b>07-20~24</div>
+        <div class="week"><b>W4</b>07-27~31</div>
+        <div class="week"><b>W5</b>08-03~07</div>
+        <div class="week"><b>W6</b>08-10~14</div>
+      </div>
+    </div>
+
+    <!-- ===== Sprint 1 ===== -->
+    <div class="group">
+      <div class="group-title"><span class="dot" style="background:var(--s1)"></span>Sprint 1 · 기반 구축 + 적립 루프 (07-06 ~ 07-17)</div>
+      <div class="row"><div class="label">T-01 프로젝트 세팅 (Next.js+Supabase)</div><div class="track"><div class="bar s1" style="left:0%;width:3.33%"></div></div></div>
+      <div class="row"><div class="label">T-02 DB 스키마·마이그레이션·RLS</div><div class="track"><div class="bar s1" style="left:3.33%;width:5%"></div></div></div>
+      <div class="row"><div class="label">T-03 이메일 로그인 (Auth)</div><div class="track"><div class="bar s1" style="left:8.33%;width:3.33%"></div></div></div>
+      <div class="row"><div class="label">T-04 FEAT-001 매장 등록·설정 ★</div><div class="track"><div class="bar s1" style="left:11.67%;width:6.67%"></div></div></div>
+      <div class="row"><div class="label">T-05 FEAT-002 QR 도장 적립 ★</div><div class="track"><div class="bar s1" style="left:18.33%;width:10%"></div></div></div>
+      <div class="row"><div class="label">S1 버퍼</div><div class="track"><div class="bar buffer" style="left:28.33%;width:5%"></div></div></div>
+      <div class="row"><div class="label"></div><div class="track"><div class="ms" style="left:33.33%"></div><div class="ms-label right" style="left:33.33%">M1 코어 적립 루프 데모 (07-17)</div></div></div>
+    </div>
+
+    <!-- ===== Sprint 2 ===== -->
+    <div class="group">
+      <div class="group-title"><span class="dot" style="background:var(--s2)"></span>Sprint 2 · 쿠폰 루프 완성 + E2E 통합 (07-20 ~ 07-31)</div>
+      <div class="row"><div class="label">T-06 FEAT-003 쿠폰 발행·사용 ★</div><div class="track"><div class="bar s2" style="left:33.33%;width:10%"></div></div></div>
+      <div class="row"><div class="label">T-07 FEAT-004 손님 적립 현황 ★</div><div class="track"><div class="bar s2" style="left:43.33%;width:6.67%"></div></div></div>
+      <div class="row"><div class="label">T-08 핵심 여정 E2E 통합 점검</div><div class="track"><div class="bar s2" style="left:50%;width:5%"></div></div></div>
+      <div class="row"><div class="label">T-09 FEAT-005 통계 (스트레치)</div><div class="track"><div class="bar stretch" style="left:55%;width:6.67%"></div></div></div>
+      <div class="row"><div class="label">S2 버퍼</div><div class="track"><div class="bar buffer" style="left:61.67%;width:5%"></div></div></div>
+      <div class="row"><div class="label"></div><div class="track"><div class="ms" style="left:66.67%"></div><div class="ms-label" style="left:66.67%">M2 핵심 여정 E2E 완주 (07-31)</div></div></div>
+    </div>
+
+    <!-- ===== Sprint 3 ===== -->
+    <div class="group">
+      <div class="group-title"><span class="dot" style="background:var(--s3)"></span>Sprint 3 · QA + 운영 + 포트폴리오 (08-03 ~ 08-14)</div>
+      <div class="row"><div class="label">T-10 TC 작성·실행 (정책 오류 포함)</div><div class="track"><div class="bar s3" style="left:66.67%;width:10%"></div></div></div>
+      <div class="row"><div class="label">T-11 버그 수정·안정화</div><div class="track"><div class="bar s3" style="left:76.67%;width:6.67%"></div></div></div>
+      <div class="row"><div class="label"></div><div class="track"><div class="ms" style="left:83.33%"></div><div class="ms-label" style="left:83.33%">M3 TC Pass율 90% (08-07)</div></div></div>
+      <div class="row"><div class="label">T-12 운영 배포·파일럿 온보딩</div><div class="track"><div class="bar s3" style="left:83.33%;width:6.67%"></div></div></div>
+      <div class="row"><div class="label">T-13 포트폴리오 정리</div><div class="track"><div class="bar s3" style="left:90%;width:6.67%"></div></div></div>
+      <div class="row"><div class="label">S3 버퍼</div><div class="track"><div class="bar buffer" style="left:96.67%;width:3.33%"></div></div></div>
+      <div class="row"><div class="label"></div><div class="track"><div class="ms" style="left:100%"></div><div class="ms-label" style="left:100%">M4 파일럿 오픈 + 포트폴리오 (08-14)</div></div></div>
+    </div>
+
+    <div class="legend">
+      <span><span class="dot" style="background:var(--s1)"></span>Sprint 1</span>
+      <span><span class="dot" style="background:var(--s2)"></span>Sprint 2</span>
+      <span><span class="dot" style="background:var(--s3)"></span>Sprint 3</span>
+      <span><span class="dot" style="background:var(--buffer)"></span>버퍼</span>
+      <span><span class="st-i"></span>스트레치 골</span>
+      <span><span class="ms-i"></span>마일스톤</span>
+    </div>
+    <div class="note">★ = 기능명세서의 5단계 구현 후보(Must). 가로축은 주말을 제외한 작업일 기준으로 압축되어 있습니다. 상세 근거는 sprint-plan.md 참조.</div>
+  </div>
+</div>
+</body>
+</html>

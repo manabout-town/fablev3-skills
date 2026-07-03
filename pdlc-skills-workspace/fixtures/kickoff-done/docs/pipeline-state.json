@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "project": {
+    "name": "단골도장",
+    "one_liner": "동네 카페 사장님을 위한 디지털 단골 쿠폰 서비스",
+    "type": "side-project",
+    "created_at": "2026-07-01"
+  },
+  "current_stage": 1,
+  "stages": {
+    "1": { "name": "asis-tobe",    "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "2": { "name": "requirements", "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "3": { "name": "spec",         "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "4": { "name": "sprint-plan",  "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "5": { "name": "build",        "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "6": { "name": "qa",           "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "7": { "name": "ops",          "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "8": { "name": "portfolio",    "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false }
+  },
+  "decisions": [],
+  "risks": []
+}

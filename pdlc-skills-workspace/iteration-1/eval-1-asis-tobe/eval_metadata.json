@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "asis-tobe-analysis",
+  "prompt": "1단계 진행하자. 동네 카페 사장님이 종이 쿠폰으로 단골 관리하는 현행 프로세스를 분석하고 AS-IS/TO-BE 문서를 만들어줘.",
+  "assertions": [
+    "Analysis doc exists at convention path docs/01-process-analysis.md",
+    "Pain points carry PP-### IDs with quantitative/qualitative evidence and cause analysis",
+    "Two Mermaid flowcharts present (AS-IS and TO-BE)",
+    "TO-BE steps mapped to PP IDs in a mapping table; unresolved PPs marked out-of-scope",
+    "Quantitative expected-effects table (AS-IS vs TO-BE metrics)",
+    "pipeline-state.json updated: stage 1 done with outputs/summary, current_stage advanced to 2"
+  ]
+}

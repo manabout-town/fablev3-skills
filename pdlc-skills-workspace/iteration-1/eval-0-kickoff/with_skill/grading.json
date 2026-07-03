@@ -1,0 +1,32 @@
+{
+  "expectations": [
+    {
+      "text": "Project brief at docs/00-project-brief.md with 한 줄 정의/Out of Scope/제약/성공 기준",
+      "passed": true,
+      "evidence": "file docs/00-project-brief.md; missing sections: none"
+    },
+    {
+      "text": "pipeline-state.json matches 8-stage schema",
+      "passed": true,
+      "evidence": "keys: ['current_stage', 'decisions', 'project', 'risks', 'stages', 'version']; stages: ['1', '2', '3', '4', '5', '6', '7', '8']"
+    },
+    {
+      "text": "Assumptions explicitly recorded",
+      "passed": true,
+      "evidence": "15 mentions of 가정/assumption"
+    },
+    {
+      "text": "Guides user to stage 1 (AS-IS/TO-BE) next",
+      "passed": true,
+      "evidence": "mentions 1단계/AS-IS next"
+    }
+  ],
+  "pass_count": 4,
+  "total": 4,
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  }
+}

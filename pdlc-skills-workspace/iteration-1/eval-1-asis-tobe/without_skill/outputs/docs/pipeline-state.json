@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "project": {
+    "name": "단골도장",
+    "one_liner": "동네 카페 사장님을 위한 디지털 단골 쿠폰 서비스",
+    "type": "side-project",
+    "created_at": "2026-07-01"
+  },
+  "current_stage": 2,
+  "stages": {
+    "1": {
+      "name": "asis-tobe",
+      "status": "done",
+      "completed_at": "2026-07-02",
+      "outputs": ["docs/01-asis-tobe.md"],
+      "summary": "종이 쿠폰 기반 현행 프로세스(발행·적립·사용·단골 파악)를 분석해 Pain Point 8건을 도출하고, 무설치 웹 기반 TO-BE 프로세스와 갭 분석, 요구사항 후보 8건, 미결 사항 4건을 정의함.",
+      "stale": false
+    },
+    "2": { "name": "requirements", "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "3": { "name": "spec",         "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "4": { "name": "sprint-plan",  "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "5": { "name": "build",        "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "6": { "name": "qa",           "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "7": { "name": "ops",          "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false },
+    "8": { "name": "portfolio",    "status": "pending", "completed_at": null, "outputs": [], "summary": "", "stale": false }
+  },
+  "decisions": [
+    {
+      "id": "D-001",
+      "date": "2026-07-02",
+      "stage": 1,
+      "decision": "재방문 유도 메시지 발송(D2)은 개인정보 최소 수집 제약과 6주 일정을 고려해 1차 범위에서 제외를 기본안으로 함 (2단계에서 최종 확정)"
+    }
+  ],
+  "risks": [
+    { "id": "R1", "risk": "손님의 QR 스캔·웹 진입 번거로움으로 적립 참여율 저하", "impact": "상", "mitigation": "무설치·무로그인 지향, 적립 단계 최소화" },
+    { "id": "R2", "risk": "사장님 승인 단계의 피크타임 병목", "impact": "중", "mitigation": "1탭 승인 설계, 승인 대기 목록 제공" },
+    { "id": "R3", "risk": "휴대폰 번호 수집에 따른 개인정보 부담", "impact": "중", "mitigation": "최소 수집 원칙, 수집·보관 정책을 2단계 요구사항에 명시" },
+    { "id": "R4", "risk": "통신 장애 시 적립 불가", "impact": "하", "mitigation": "사후 적립 보정 기능 검토" },
+    { "id": "R5", "risk": "1인 6주 일정의 범위 팽창", "impact": "상", "mitigation": "Out of Scope 준수, 제외 기본안 유지" }
+  ]
+}

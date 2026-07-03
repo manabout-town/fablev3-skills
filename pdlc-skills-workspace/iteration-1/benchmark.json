@@ -1,0 +1,338 @@
+{
+  "metadata": {
+    "skill_name": "pdlc-pipeline-suite",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-07-02T08:10:57Z",
+    "evals_run": [
+      0,
+      1,
+      2
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 137.6,
+        "tokens": 49842,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Project brief at docs/00-project-brief.md with 한 줄 정의/Out of Scope/제약/성공 기준",
+          "passed": true,
+          "evidence": "file docs/00-project-brief.md; missing sections: none"
+        },
+        {
+          "text": "pipeline-state.json matches 8-stage schema",
+          "passed": true,
+          "evidence": "keys: ['current_stage', 'decisions', 'project', 'risks', 'stages', 'version']; stages: ['1', '2', '3', '4', '5', '6', '7', '8']"
+        },
+        {
+          "text": "Assumptions explicitly recorded",
+          "passed": true,
+          "evidence": "15 mentions of 가정/assumption"
+        },
+        {
+          "text": "Guides user to stage 1 (AS-IS/TO-BE) next",
+          "passed": true,
+          "evidence": "mentions 1단계/AS-IS next"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 232.4,
+        "tokens": 54604,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Doc at convention path docs/01-process-analysis.md",
+          "passed": true,
+          "evidence": "docs/01-process-analysis.md"
+        },
+        {
+          "text": "Pain points have PP-### IDs + evidence + cause analysis",
+          "passed": true,
+          "evidence": "PP IDs: ['PP-001', 'PP-002', 'PP-003', 'PP-004', 'PP-005', 'PP-006', 'PP-007'], cause-analysis section: True"
+        },
+        {
+          "text": "Two Mermaid flowcharts (AS-IS, TO-BE)",
+          "passed": true,
+          "evidence": "2 mermaid blocks"
+        },
+        {
+          "text": "TO-BE ↔ PP mapping table with out-of-scope PPs",
+          "passed": true,
+          "evidence": "mapping+scope-out language present"
+        },
+        {
+          "text": "Quantitative expected-effects table",
+          "passed": true,
+          "evidence": "expected-effects table found"
+        },
+        {
+          "text": "State: stage1 done, current_stage 2",
+          "passed": true,
+          "evidence": "stage1=done, current=2, outputs=['docs/01-process-analysis.md']"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 342.5,
+        "tokens": 68233,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Core 3 features finalized with elimination rationale",
+          "passed": true,
+          "evidence": "picked123=True, elimination-rationale=True, explicit-3=True"
+        },
+        {
+          "text": "Milestones have verifiable exit criteria",
+          "passed": true,
+          "evidence": "verifiable exit criteria found"
+        },
+        {
+          "text": "Mermaid gantt with deps + crit marking",
+          "passed": true,
+          "evidence": "gantt+after=True, crit=True"
+        },
+        {
+          "text": "Self-contained gantt HTML (no CDN)",
+          "passed": true,
+          "evidence": "docs/04-plan/gantt.html; external CDN: False"
+        },
+        {
+          "text": "Explicit 15-20% buffer",
+          "passed": true,
+          "evidence": "explicit buffer % found"
+        },
+        {
+          "text": "State: stage4 done, current_stage 5, decision recorded",
+          "passed": true,
+          "evidence": "stage4=done, current=5, decisions=3"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 4,
+        "total": 4,
+        "time_seconds": 314.7,
+        "tokens": 55168,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Project brief at docs/00-project-brief.md with 한 줄 정의/Out of Scope/제약/성공 기준",
+          "passed": false,
+          "evidence": "no docs/00-project-brief.md"
+        },
+        {
+          "text": "pipeline-state.json matches 8-stage schema",
+          "passed": false,
+          "evidence": "no pipeline-state.json"
+        },
+        {
+          "text": "Assumptions explicitly recorded",
+          "passed": false,
+          "evidence": "0 mentions of 가정/assumption"
+        },
+        {
+          "text": "Guides user to stage 1 (AS-IS/TO-BE) next",
+          "passed": false,
+          "evidence": "no stage-1 guidance found"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.3333,
+        "passed": 2,
+        "failed": 4,
+        "total": 6,
+        "time_seconds": 180.1,
+        "tokens": 46589,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Doc at convention path docs/01-process-analysis.md",
+          "passed": false,
+          "evidence": "not found (convention path)"
+        },
+        {
+          "text": "Pain points have PP-### IDs + evidence + cause analysis",
+          "passed": false,
+          "evidence": "PP IDs: [], cause-analysis section: True"
+        },
+        {
+          "text": "Two Mermaid flowcharts (AS-IS, TO-BE)",
+          "passed": false,
+          "evidence": "0 mermaid blocks"
+        },
+        {
+          "text": "TO-BE ↔ PP mapping table with out-of-scope PPs",
+          "passed": false,
+          "evidence": "no PP mapping table w/ out-of-scope"
+        },
+        {
+          "text": "Quantitative expected-effects table",
+          "passed": true,
+          "evidence": "expected-effects table found"
+        },
+        {
+          "text": "State: stage1 done, current_stage 2",
+          "passed": true,
+          "evidence": "stage1=done, current=2, outputs=['docs/01-asis-tobe.md']"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 3,
+        "failed": 3,
+        "total": 6,
+        "time_seconds": 203.6,
+        "tokens": 51332,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Core 3 features finalized with elimination rationale",
+          "passed": false,
+          "evidence": "picked123=True, elimination-rationale=True, explicit-3=False"
+        },
+        {
+          "text": "Milestones have verifiable exit criteria",
+          "passed": false,
+          "evidence": "not found"
+        },
+        {
+          "text": "Mermaid gantt with deps + crit marking",
+          "passed": false,
+          "evidence": "gantt+after=True, crit=False"
+        },
+        {
+          "text": "Self-contained gantt HTML (no CDN)",
+          "passed": true,
+          "evidence": "docs/04-sprint-plan/gantt-chart.html; external CDN: False"
+        },
+        {
+          "text": "Explicit 15-20% buffer",
+          "passed": true,
+          "evidence": "explicit buffer % found"
+        },
+        {
+          "text": "State: stage4 done, current_stage 5, decision recorded",
+          "passed": true,
+          "evidence": "stage4=done, current=5, decisions=1"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 237.5,
+        "stddev": 102.5452,
+        "min": 137.6,
+        "max": 342.5
+      },
+      "tokens": {
+        "mean": 57559.6667,
+        "stddev": 9545.1136,
+        "min": 49842,
+        "max": 68233
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.2778,
+        "stddev": 0.2546,
+        "min": 0.0,
+        "max": 0.5
+      },
+      "time_seconds": {
+        "mean": 232.8,
+        "stddev": 71.8942,
+        "min": 180.1,
+        "max": 314.7
+      },
+      "tokens": {
+        "mean": 51029.6667,
+        "stddev": 4297.4835,
+        "min": 46589,
+        "max": 55168
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.72",
+      "time_seconds": "+4.7",
+      "tokens": "+6530"
+    }
+  },
+  "notes": [
+    "스킬 사용 시 3개 케이스 모두 100% (16/16). 미사용 시 27.8% — 격차는 주로 규약(파일 경로, ID 체계, 상태 스키마) 준수에서 발생. 미사용 산출물도 문서 품질 자체는 준수하나 파이프라인으로 연결이 안 되는 형태.",
+    "주의: 어서션 상당수가 스킬이 정의한 규약 자체를 검사하므로 baseline에 구조적으로 불리함. 다만 '검증 가능한 exit criteria', 'crit 마킹', '탈락 사유 기록' 같은 품질 어서션에서도 baseline이 실패한 점은 유의미.",
+    "비용: 스킬 사용 시 토큰 +13% (규약/템플릿 로드 비용). 시간 차이는 노이즈 수준.",
+    "발견 이슈: eval-1 with_skill이 '사용자 리뷰 전 완료 처리 금지'를 지킬 수 없어 문서를 Draft로 두면서 상태는 done으로 올림 — 비대화형 실행에서의 절충이며 실사용(대화형)에서는 문제 없음."
+  ]
+}

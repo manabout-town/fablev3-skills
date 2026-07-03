@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "sprint-plan-gantt",
+  "prompt": "4단계 진행하자. 스프린트 계획 세우고 간트차트 만들어줘. 2026-07-06 시작으로.",
+  "assertions": [
+    "Core 3 features finalized out of 4 ★ candidates with elimination rationale recorded as a decision",
+    "Milestones have verifiable exit criteria (not vague like '개발 완료')",
+    "Mermaid gantt present with dependency (after) and critical-path (crit) marking",
+    "Self-contained interactive gantt HTML file exists (no external CDN)",
+    "Explicit schedule buffer of 15-20% stated",
+    "pipeline-state.json updated: stage 4 done, current_stage 5, decision recorded"
+  ]
+}
