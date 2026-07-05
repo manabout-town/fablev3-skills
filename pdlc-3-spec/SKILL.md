@@ -44,6 +44,8 @@ Mark **candidate core features (★)** for stage-5 implementation now. Criteria:
 
 Walk `references/policy-checklist.md` and derive the policies that apply to this service. Each POL follows situation → rule → rationale. Cross-check that functional-spec error cases and policies reference each other. If any personal data is collected, the collection-items/purpose/retention table is mandatory (per Korean 개인정보보호법).
 
+For every **state-changing action** (write/update/delete/like/comment/apply), the policy doc must answer: who may do it (login? role? ownership?), in what target state, and what the system does when a non-eligible actor tries anyway (error copy included). These rules become the guard inventory that `pdlc-guard-audit` verifies against the build after stage 5 — an action with no stated rule is a guard gap waiting to ship.
+
 ### 5. Cross-validate and wrap up
 
 - Verify mutual references across the three documents: every FEAT → REQ, SCR → FEAT, FEAT error case → POL. Hunt down orphan IDs (referenced by nothing).

@@ -196,6 +196,23 @@ Notion 포트폴리오 페이지
 
 ---
 
+### 애드온 `pdlc-guard-audit` — 방어 코드 감사 (5단계 · 시드 데이터 직후)
+
+명세가 암시하는 모든 가드 지점을 인벤토리(GRD-###)로 전수 도출하고, 실제 빌드에 대해 금지된 행동을 직접 시도해 서버가 거부하는지 확인한다. 예: 비로그인 상태에서 댓글·좋아요 요청 → 서버 거부 확인. **UI에서 버튼을 숨긴 것은 가드가 아니다** — 신뢰 경계(서버 액션/API/RLS)에서 막혀야 통과. 빠진 가드는 즉시 수정하고, 정책 근거가 없던 가드는 3단계 정책서에 POL로 역기입한다.
+
+**5가지 가드 클래스:** ① 인증(비로그인 차단) ② 권한(남의 리소스·역할) ③ 상태(삭제·만료·마감 대상) ④ 입력(서버측 유효성) ⑤ 중복·남용(이중 제출, 리플레이)
+
+**사용 시점:** `"방어 코드 점검하자"`, `"권한 체크 빠진 데 없나"`, `"비로그인 차단 확인"`, `"가드 감사"`
+
+| 산출물 | 설명 |
+|--------|------|
+| `docs/056-guard/guard-audit.md` | 가드 인벤토리 + 검증 결과(holds/missing/partial) + 수정 기록 |
+| 코드 수정 + POL 역기입 | 누락 가드 수정(재검증 필수), 정책 공백은 policies.md에 추가 |
+
+QA(6단계)가 명세된 negative 케이스를 검증한다면, 이 감사는 모든 변이(mutation) 진입점 × 가드 클래스를 전수 스윕한다. 적대적 검증(pdlc-adversarial) 전에 돌리면 팀 블랙이 사소한 인증 누락 대신 깊은 틈을 파게 된다.
+
+---
+
 ### 애드온 `pdlc-adversarial` — 적대적 검증 사이클 (6단계 ↔ 7단계 사이)
 
 팀 블랙(최선을 다해 버그를 유발)과 팀 화이트(버그 수정 + 후속 위험 진단)가 최대 2라운드 진행한다. 한 라운드에서 팀 블랙이 버그를 하나도 못 내면 사이클을 조기 종료하고 다음 단계로 — "버그 없음"을 실패가 아닌 내구성 신호로 취급한다. QA가 명세 기반 협조적 검증이라면, 이 스킬은 명세 밖 틈을 노리는 적대적 검증이다.
@@ -270,6 +287,7 @@ cp -r fablev3-skills/pdlc-7-ops ~/.claude/skills/
 cp -r fablev3-skills/pdlc-8-portfolio ~/.claude/skills/
 cp -r fablev3-skills/pdlc-feature-advisor ~/.claude/skills/
 cp -r fablev3-skills/pdlc-seed-data ~/.claude/skills/
+cp -r fablev3-skills/pdlc-guard-audit ~/.claude/skills/
 cp -r fablev3-skills/pdlc-adversarial ~/.claude/skills/
 cp -r fablev3-skills/pdlc-launch-readiness ~/.claude/skills/
 ```
@@ -308,6 +326,7 @@ AS-IS 분석해줘               → 1단계 (pdlc-1-asis-tobe)
 간트차트 만들어줘             → 4단계 (pdlc-4-sprint-plan)
 이제 구현하자                 → 5단계 (pdlc-5-build)
 더미데이터 넣고 돌려보자      → 애드온 (pdlc-seed-data)
+방어 코드 점검하자            → 애드온 (pdlc-guard-audit)
 테스트 시나리오 작성해줘      → 6단계 (pdlc-6-qa)
 팀 블랙 팀 화이트 돌리자      → 애드온 (pdlc-adversarial)
 운영 이슈 시나리오 만들자     → 7단계 (pdlc-7-ops)
